@@ -21,6 +21,7 @@ function App() {
       channel: 'candles', 
       key: 'trade:1D:tBTCUSD' ,
       sort:1
+      
     })
 
     socket.onopen = (e) => {
