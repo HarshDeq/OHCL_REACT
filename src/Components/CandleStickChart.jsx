@@ -24,13 +24,6 @@ const CandleStickChart = () => {
       key: 'trade:1m:tBTCUSD',
       sort:1
     })
-
-    let book = JSON.stringify({ 
-      event: 'subscribe', 
-      channel: 'book', 
-      symbol: 'tBTCUSD' 
-    })
-
     socket.onopen = (e) => {
       console.log("Open");
       socket.send(ohcl)
@@ -39,8 +32,6 @@ const CandleStickChart = () => {
     socket.onmessage = (e) => {
 
       let data = JSON.parse(e.data)
-  
-
       if(data[1]?.length === 240){
         dispatch(formatData(
           data[1]?.reverse()
@@ -51,15 +42,11 @@ const CandleStickChart = () => {
         [data[1]]
         ))
       }
-
     };
 
-
-    socket.onerror= err=>{
-      console.log("err",err)
-    }
-
+   
     socket.onclose=(e)=>{
+      
       console.log(e)
     }
 
