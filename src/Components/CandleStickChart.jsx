@@ -1,10 +1,74 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { IgrFinancialChart, IgrFinancialChartModule } from "igniteui-react-charts";
+import { useDispatch, useSelector } from 'react-redux';
+import { formatData } from '../Redux/OHCLDATA/action';
 
 
 IgrFinancialChartModule.register();
 
-const CandleStickChart = ({data}) => {
+const CandleStickChart = () => {
+
+
+  const dispatch = useDispatch()
+
+  const {OHCL} = useSelector(state=>state.ohcl)
+
+  const socket = new WebSocket(
+    "wss://api-pub.bitfinex.com/ws/2"
+  );
+  useEffect(()=>{
+
+    let ohcl = JSON.stringify({ 
+      event: 'subscribe', 
+      channel: 'candles', 
+      key: 'trade:1m:tBTCUSD',
+      sort:1
+    })
+
+    let book = JSON.stringify({ 
+      event: 'subscribe', 
+      channel: 'book', 
+      symbol: 'tBTCUSD' 
+    })
+
+    socket.onopen = (e) => {
+      console.log("Open");
+      socket.send(ohcl)
+    };
+    
+    socket.onmessage = (e) => {
+
+      let data = JSON.parse(e.data)
+  
+
+      if(data[1]?.length === 240){
+        dispatch(formatData(
+          data[1]?.reverse()
+        ))
+
+      }else if(data[1]?.length === 6){
+        dispatch(formatData(
+        [data[1]]
+        ))
+      }
+
+    };
+
+
+    socket.onerror= err=>{
+      console.log("err",err)
+    }
+
+    socket.onclose=(e)=>{
+      console.log(e)
+    }
+
+    
+
+
+  },[])
+
+
   return (
     <div className='container'>
           <IgrFinancialChart
@@ -26,7 +90,7 @@ const CandleStickChart = ({data}) => {
             yAxisTitleRightMargin="5"
             yAxisLabelLeftMargin="0"
             zoomSliderType="None"
-            dataSource={data}
+            dataSource={OHCL}
             
           />
     </div>
