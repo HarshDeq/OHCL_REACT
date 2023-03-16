@@ -53,11 +53,11 @@ const OrderBook = () => {
                     });
 
                     dispatch(setOrderBookdata({ negative: neg, positive: pos }));
-                } else if (data[indexOfArrOfAskandBid]?.length === constantLengthOfSingleBidorAsk) {
-                    if (data[indexOfArrOfAskandBid][indexOfAmount] < 0) {
-                        dispatch(setNegativeData(data[indexOfArrOfAskandBid]));
+                } else if (arrOfAskandBid[indexOfArrOfAskandBid]?.length === constantLengthOfSingleBidorAsk) {
+                    if (arrOfAskandBid[indexOfArrOfAskandBid][indexOfAmount] < 0) {
+                        dispatch(setNegativeData(arrOfAskandBid[indexOfArrOfAskandBid]));
                     } else {
-                        dispatch(setPostiveData(data[indexOfArrOfAskandBid]));
+                        dispatch(setPostiveData(arrOfAskandBid[indexOfArrOfAskandBid]));
                     }
                 }
             };
