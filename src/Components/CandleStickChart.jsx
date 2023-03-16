@@ -47,7 +47,7 @@ const CandleStickChart = () => {
 
    
     socket.onclose=(e)=>{    
-      alert("Socket Close") 
+     
       console.log(e)
     }
   },[])

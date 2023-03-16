@@ -24,6 +24,11 @@
 }
 
 
+.header-container-links-container-link:focus{
+    color: red;
+}
+
+
 
 
 .container{

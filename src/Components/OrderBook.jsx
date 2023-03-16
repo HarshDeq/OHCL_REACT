@@ -34,7 +34,12 @@ const OrderBook = () => {
 
   return (
     <div className='oder-book-conatiner'>
-      <h2>Order Book</h2>
+      <div>
+        T1
+      </div>
+      <div>
+        T1
+      </div>
     </div>
   )
 }
