@@ -1,9 +1,15 @@
-import { SET_DATA } from "./actionTypes"
+import { RESET_DATA, SET_DATA } from "./actionTypes"
 
 const setData = payload=>{
     return{
         type:SET_DATA,
         payload
+    }
+}
+
+export const resetData = () =>{
+    return {
+        type:RESET_DATA
     }
 }
 

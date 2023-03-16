@@ -1,4 +1,4 @@
-import { SET_DATA } from "./actionTypes"
+import { RESET_DATA, SET_DATA } from "./actionTypes"
 
 
 const init = {
@@ -14,6 +14,9 @@ export const ohclReducer = (state=init,{payload, type}) =>{
                 ...state, OHCL:[...state.OHCL, ...payload]
             }
 
+        case RESET_DATA:{
+            return init
+        }
 
         default:
             return state

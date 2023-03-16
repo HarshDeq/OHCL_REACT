@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { IgrFinancialChart, IgrFinancialChartModule } from "igniteui-react-charts";
 import { useDispatch, useSelector } from 'react-redux';
-import { formatData } from '../Redux/OHCLDATA/action';
+import { formatData, resetData, setData } from '../Redux/OHCLDATA/action';
 
 
 IgrFinancialChartModule.register();
@@ -33,6 +33,7 @@ const CandleStickChart = () => {
 
       let data = JSON.parse(e.data)
       if(data[1]?.length === 240){
+        dispatch(resetData())
         dispatch(formatData(
           data[1]?.reverse()
         ))
@@ -45,12 +46,8 @@ const CandleStickChart = () => {
     };
 
    
-    socket.onclose=(e)=>{
-      socket.onopen = (e) => {
-        console.log("Open");
-        socket.send(ohcl)
-      };
-      
+    socket.onclose=(e)=>{    
+      alert("Socket Close") 
       console.log(e)
     }
   },[])
