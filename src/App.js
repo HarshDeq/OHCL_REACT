@@ -3,14 +3,18 @@ import './App.css';
 
 import CandleStickChart from './Components/CandleStickChart';
 import OrderBook from './Components/OrderBook';
+import AllRoutes from './Routes/AllRoutes';
 
 
 function App() {
   
   return (
     <div className="App">
-      <CandleStickChart  />
+      {/* <CandleStickChart  />
       <OrderBook />
+       */}
+
+       <AllRoutes />
     </div>
   );
 }

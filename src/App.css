@@ -1,4 +1,37 @@
+.header-container{
+
+    display: flex;
+    padding: 15px 20px;
+    justify-content: space-between;
+    background-color: #002B5B;
+}
+
+.header-container-logo{
+    font-size: 20px;
+    font-weight: 600;
+    color:white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.header-container-links-container{
+        display: flex;
+}
+
+.header-container-links-container-link{
+    margin: 0 5px;
+    color: white;
+    text-decoration: none;        
+}
+
+
+
+
 .container{
     height: 300px;
-    padding: 10px;
+    padding: 10px 20px 10px 0;
+}
+
+.oder-book-conatiner{
+    margin: 10px;
+
 }

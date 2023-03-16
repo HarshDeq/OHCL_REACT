@@ -46,18 +46,21 @@ const CandleStickChart = () => {
 
    
     socket.onclose=(e)=>{
+      socket.onopen = (e) => {
+        console.log("Open");
+        socket.send(ohcl)
+      };
       
       console.log(e)
     }
-
-    
-
-
   },[])
 
 
   return (
-    <div className='container'>
+    <div >
+      {/* <h2>OHCL Chart</h2> */}
+      <div className='container'>
+
           <IgrFinancialChart
             width="100%"
             height="100%"
@@ -79,7 +82,8 @@ const CandleStickChart = () => {
             zoomSliderType="None"
             dataSource={OHCL}
             
-          />
+            />
+            </div>
     </div>
   )
 }
