@@ -1,2 +1,1 @@
-export const SET_DATA = "SET_DATA"
-export const RESET_DATA = "RESET_DATA"
+export const SET_CANDLESTICK_DATA = 'SET_CANDLESTICK_DATA';

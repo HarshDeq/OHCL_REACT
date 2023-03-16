@@ -1,24 +1,20 @@
-import { RESET_DATA, SET_DATA } from "./actionTypes"
+import { SET_CANDLESTICK_DATA } from './actionTypes';
 
 
 const init = {
-    OHCL :[ ]
-}
+    OHLC :[]
+};
 
 
 export const ohclReducer = (state=init,{payload, type}) =>{
     switch(type){
+    case SET_CANDLESTICK_DATA:
+        return{
+            ...state, OHLC:payload
+        };
 
-        case SET_DATA:
-            return{
-                ...state, OHCL:[...state.OHCL, ...payload]
-            }
-
-        case RESET_DATA:{
-            return init
-        }
-
-        default:
-            return state
+   
+    default:
+        return state;
     }
-}   
+};   

@@ -1,22 +1,17 @@
-
+import React from 'react';
 import './App.css';
-
-import CandleStickChart from './Components/CandleStickChart';
-import OrderBook from './Components/OrderBook';
 import AllRoutes from './Routes/AllRoutes';
 
 
 function App() {
   
-  return (
-    <div className="App">
-      {/* <CandleStickChart  />
-      <OrderBook />
-       */}
+    return (
+        <div className="App">
+  
 
-       <AllRoutes />
-    </div>
-  );
+            <AllRoutes />
+        </div>
+    );
 }
 
 export default App;

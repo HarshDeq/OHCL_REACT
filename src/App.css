@@ -24,12 +24,14 @@
 }
 
 
-.header-container-links-container-link:focus{
+.header-container-links-container-link:focus, .header-container-links-container-link:active{
     color: red;
 }
 
 
-
+.candlestick-timeframe-container{
+    margin:20px 30px; 
+}
 
 .container{
     height: 300px;
