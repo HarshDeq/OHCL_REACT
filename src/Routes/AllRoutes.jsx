@@ -13,7 +13,7 @@ const AllRoutes = () => {
                     <Route path={PATH_OHLC} element={<CandleStickChart />} />
 
                     <Route path = {PATH_ORDER_BOOK} element={<OrderBook />} />
-                    <Route path='*' element={<Navigate to={`/${PATH_OHLC}`}replace />} />
+                    <Route path='' element={<Navigate to={`/${PATH_OHLC}`}replace />} />
                 </Route>
                 <Route path='*' element={<Navigate to={`/${PATH_OHLC}`} replace />} />
             </Routes>

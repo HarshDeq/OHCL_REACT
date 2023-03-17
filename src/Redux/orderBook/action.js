@@ -1,4 +1,4 @@
-import { RESET_ORDER_BOOK_DATA, SET_NEGATIVE_BOOK_DATA, SET_ORDER_BOOK_DATA, SET_ORDER_BOOK_SOCKET_CREATED, SET_POSITIVE_BOOK_DATA } from './actionTypes';
+import { RESET_ORDER_BOOK_DATA,  SET_ASK_ORDER_BOOK_DATA,  SET_BID_ORDER_BOOK_DATA,  SET_ORDER_BOOK_DATA, SET_ORDER_BOOK_SOCKET_CREATED, } from './actionTypes';
 
 export const setOrderBookdata = (payload)=>{
     return {
@@ -13,16 +13,16 @@ export const resetOrderBook = ()=>{
     };
 };
 
-export const setPostiveData = (payload)=>{
+export const setAskData = (payload)=>{
     return{
-        type:SET_POSITIVE_BOOK_DATA,payload
+        type:SET_ASK_ORDER_BOOK_DATA,payload
     };
 };
 
-export const setNegativeData = (payload)=>{
+export const setBidData = (payload)=>{
     
     return{
-        type:SET_NEGATIVE_BOOK_DATA,payload
+        type:SET_BID_ORDER_BOOK_DATA,payload
     };
 };
 

@@ -1,83 +1,140 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    setNegativeData,
+    setAskData,
+    setBidData,
     setOrderBookdata,
     setOrderBookSocketCreated,
-    setPostiveData,
 } from '../Redux/orderBook/action';
 // import { useDispatch, useSelector } from 'react-redux';
 
 const OrderBook = () => {
     const dispatch = useDispatch();
-    const {  orderBooKSocketCreated ,negative} = useSelector(
+    const { orderBooKSocketCreated, asks,bids } = useSelector(
         (state) => state?.orderBook
     );
 
     useEffect(() => {
         const socket = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
-        console.log(orderBooKSocketCreated, 'open')
+        console.log(orderBooKSocketCreated, 'open');
 
         if (!orderBooKSocketCreated) {
-            let book = JSON.stringify({
+            const book = JSON.stringify({
                 event: 'subscribe',
                 channel: 'book',
                 symbol: 'tBTCUSD',
+                freq:'F0',
+                prec:'P1'
             });
             socket.onopen = () => {
                 console.log('Open');
-                dispatch(setOrderBookSocketCreated(true))
+                dispatch(setOrderBookSocketCreated(true));
                 socket.send(book);
             };
 
             socket.onmessage = (e) => {
-                const indexOfArrOfAskandBid = 1
-                const constantLengthWhenConnectionOpen = 50
-                const constantLengthOfSingleBidorAsk = 3
-                const indexOfAmount = 2
+                const indexOfArrOfAskandBid = 1;
+                const constantLengthWhenConnectionOpen = 50;
+                const constantLengthOfSingleBidorAsk = 3;
+                const indexOfAmount = 2;
                 let arrOfAskandBid = JSON.parse(e.data);
 
+                // console.log(arrOfAskandBid)
 
-                // console.log(data)
-
-                if (arrOfAskandBid[indexOfArrOfAskandBid]?.length === constantLengthWhenConnectionOpen) {
-                    let pos = [];
-                    let neg = [];
+                if (
+                    arrOfAskandBid[indexOfArrOfAskandBid]?.length ===
+          constantLengthWhenConnectionOpen
+                ) {
+                    let askArr = [];
+                    let bidArr = [];
 
                     arrOfAskandBid[indexOfArrOfAskandBid]?.forEach((item) => {
-                        if (item[indexOfArrOfAskandBid] < 0) {
-                            neg.push(item);
+                        if (item[indexOfAmount] < 0) {
+                            const indexOfNegativeNum = 2;
+                            bidArr.push([
+                                ...item.slice(0, 2),
+                                Math.abs(item[indexOfNegativeNum]),
+                            ]);
                         } else {
-                            pos.push(item);
+                            askArr.push(item);
                         }
                     });
 
-                    dispatch(setOrderBookdata({ negative: neg, positive: pos }));
-                } else if (arrOfAskandBid[indexOfArrOfAskandBid]?.length === constantLengthOfSingleBidorAsk) {
+                    dispatch(setOrderBookdata({ bids: bidArr, asks: askArr }));
+                } else if (
+                    arrOfAskandBid[indexOfArrOfAskandBid]?.length ===
+          constantLengthOfSingleBidorAsk
+                ) {
                     if (arrOfAskandBid[indexOfArrOfAskandBid][indexOfAmount] < 0) {
-                        dispatch(setNegativeData(arrOfAskandBid[indexOfArrOfAskandBid]));
+                        dispatch(
+                            setBidData([
+                                ...arrOfAskandBid[indexOfArrOfAskandBid].slice(0,2),
+                                Math.abs(arrOfAskandBid[indexOfArrOfAskandBid][indexOfAmount]),
+                            ])
+                        );
                     } else {
-                        dispatch(setPostiveData(arrOfAskandBid[indexOfArrOfAskandBid]));
+                        dispatch(setAskData(arrOfAskandBid[indexOfArrOfAskandBid]));
                     }
                 }
             };
         }
         socket.onclose = (e) => {
-            dispatch(setOrderBookSocketCreated(false))
+            dispatch(setOrderBookSocketCreated(false));
             console.log(e);
         };
-
-      
     }, []);
 
-    useEffect(() => {
-        console.log(negative);
-    }, [negative]);
+   
 
     return (
         <div className="oder-book-conatiner">
-            <div>T1</div>
-            <div>T1</div>
+            <div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Count</th>
+                            <th>Amount</th>
+                            <th>Total</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       
+                        {asks?.map((arr) => (
+                            <tr key = {arr[3]}>
+                                <td>{arr[1]}</td>
+                                <td>{arr[2].toFixed(4)}</td>
+                                <td>{arr[3].toFixed(4)}</td>
+                                <td>{arr[0]}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <div className='vertical-line'></div>
+            <div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Price</th>
+                            <th>Total</th>
+                            <th>Amount</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       
+                        {bids?.map((arr) => (
+                            <tr key = {arr[3]}>
+                                <td>{arr[0]}</td>
+                                <td>{arr[3].toFixed(4)}</td>
+                                <td>{arr[2].toFixed(4)}</td>
+                                <td>{arr[1]}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

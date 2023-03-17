@@ -1,29 +1,76 @@
-import { RESET_ORDER_BOOK_DATA, SET_NEGATIVE_BOOK_DATA, SET_ORDER_BOOK_DATA, SET_ORDER_BOOK_SOCKET_CREATED, SET_POSITIVE_BOOK_DATA } from './actionTypes';
+import { RESET_ORDER_BOOK_DATA, SET_ASK_ORDER_BOOK_DATA,SET_BID_ORDER_BOOK_DATA, SET_ORDER_BOOK_DATA, SET_ORDER_BOOK_SOCKET_CREATED} from './actionTypes';
 
 
 const init = {
-    positive:[],
-    negative:[],
+    asks:[],
+    bids:[],
     orderBooKSocketCreated:false
 };
 
 
+const desce = 'desce'
+const asce = 'aesce'
+
+
+const popLastItem = (arr) =>{
+
+    arr.pop()
+    return arr
+}
+
+const sumOfAmount = (arr) => {
+
+    let arrWithSum = []
+    const indexOfLastSumofPrice = 3
+    const indexOfCurrentItemPrice = 2
+
+    for(let i=0;i<arr.length;i++){
+
+        if(i ===0){
+            arrWithSum.push([...arr[i].slice(0,3),arr[i][indexOfCurrentItemPrice]]) 
+        }else{
+            arrWithSum.push([...arr[i].slice(0,3),arr[i][indexOfCurrentItemPrice] +  arrWithSum[i-1][indexOfLastSumofPrice] ]) 
+        }
+
+    }
+
+    return arrWithSum
+
+}
+
+
+const sortByPrice = (arr, sortBy)=>{
+    
+    const indexOfPrice = 0
+    let sortedArr=[]
+    
+    if(sortBy === asce){
+        
+        sortedArr = arr?.sort((a,b)=>a[indexOfPrice] - b[indexOfPrice] )
+
+    }
+    else if(sortBy === desce){
+        sortedArr = arr?.sort((a,b)=>b[indexOfPrice] - a[indexOfPrice] )
+    }
+
+    let arrWithSum = sumOfAmount(sortedArr)
+
+    return arrWithSum
+}
+
+
+
+
+
 export const orderBookReducer = (state=init, {type, payload})=>{
 
-    const popPush = (arr, newItem)=>{
-        let newArr = arr;
-        newArr.pop();
-        newArr.push(newItem);
-        return newArr;
-
-    };
-
+   
     switch(type){
 
 
     case SET_ORDER_BOOK_DATA:
         return {
-            ...state, negative:payload?.negative, positive:payload?.positive
+            ...state, bids:[...sortByPrice(payload?.bids,asce)] , asks:[...sortByPrice(payload?.asks,desce)]
         };
 
     case RESET_ORDER_BOOK_DATA:
@@ -31,14 +78,18 @@ export const orderBookReducer = (state=init, {type, payload})=>{
             state :init
         };
 
-    case SET_POSITIVE_BOOK_DATA:
+    case SET_ASK_ORDER_BOOK_DATA:
         return {
-            ...state, positive:[...popPush(state?.positive,payload)]
+            ...state, asks: [...popLastItem(
+                sortByPrice([...state.asks,payload],desce)
+            )]
         };
         
-    case SET_NEGATIVE_BOOK_DATA:
+    case SET_BID_ORDER_BOOK_DATA:
         return {
-            ...state, negative:[...popPush(state?.negative,payload)]
+            ...state, bids: [...popLastItem(
+                sortByPrice([...state.bids,payload],asce)
+            )]
         };
 
     case SET_ORDER_BOOK_SOCKET_CREATED:

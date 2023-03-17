@@ -23,12 +23,6 @@
     text-decoration: none;        
 }
 
-
-.header-container-links-container-link:focus, .header-container-links-container-link:active{
-    color: red;
-}
-
-
 .candlestick-timeframe-container{
     margin:20px 30px; 
 }
@@ -40,5 +34,25 @@
 
 .oder-book-conatiner{
     margin: 10px;
-
+    display: flex;
+    justify-content: center;
 }
+
+
+th, td {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 10px;
+    padding-right: 10px;
+    text-align: center;
+  }
+
+  th,td{
+    font-size: 12px;
+
+  }
+
+  .vertical-line{
+    border-left:2px solid black;
+    height: 100;
+  }
