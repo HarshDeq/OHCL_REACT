@@ -24,7 +24,7 @@ const OrderBook = () => {
                 channel: 'book',
                 symbol: 'tBTCUSD',
                 freq:'F0',
-                prec:'P1'
+                prec:'P0'
             });
             socket.onopen = () => {
                 console.log('Open');
