@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {  getCandleStickData } from '../Redux/OHCLDATA/action';
 import Chart from 'react-apexcharts';
-import Select from './Select';
 
 const oneMinTimeFrame = '1m'
 const timeFrames = ['1m', '30m','1h','6h','12h','1D','1W', '1M']
