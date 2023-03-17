@@ -45,7 +45,7 @@ const OrderBook = () => {
                 const indexOfAmount = 2;
                 let arrOfAskandBid = JSON.parse(e.data);
 
-                // console.log(arrOfAskandBid)
+             
 
                 if (
                     arrOfAskandBid[indexOfArrOfAskandBid]?.length ===

@@ -10,13 +10,22 @@ const setOHLCData = payload=>{
 
 
 export const formatData  =(payload) =>dispatch => {
+
+    const constantIndex = {
+        date:0,
+        O:1,
+        H:3,
+        L:4,
+        C:2
+    }
+
     let formatedData = payload?.map(data=>{
         return {
-            x:new Date(data[0]).toLocaleString('en-GB',{timezone:'Asia/Kolkata'}),
-            y:[data[1],
-                data[2],
-                data[3],
-                data[4],]
+            x:new Date(data[constantIndex?.date]),
+            y:[data[constantIndex?.O],
+                data[constantIndex?.H],
+                data[constantIndex?.L],
+                data[constantIndex?.C],]
             
         };
     });
@@ -26,7 +35,7 @@ export const formatData  =(payload) =>dispatch => {
 export const getCandleStickData = (timeFrame)=>dispatch=>{
     const config = {
         method: 'GET',
-        url: `https://api-pub.bitfinex.com/v2/candles/trade%3A${timeFrame}%3AtBTCUSD/hist`,
+        url: `https://api-pub.bitfinex.com/v2/candles/trade%3A${timeFrame}%3AtBTCUSD/hist?limit=100`,
         headers: {accept: 'application/json'}
     };
 
