@@ -1,12 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { IgrFinancialChart, IgrFinancialChartModule } from 'igniteui-react-charts';
 import { useDispatch, useSelector } from 'react-redux';
 import {  getCandleStickData } from '../Redux/OHCLDATA/action';
+import Chart from 'react-apexcharts';
 
-
-IgrFinancialChartModule.register();
 const oneMinTimeFrame = '1m'
 const timeFrames = ['1m', '30m','1h','6h','12h','1D','1W', '1M']
+const options = {
+    chart: {
+        type: 'candlestick',
+       
+        width:1000,
+        id: 'candles',
+        toolbar: {
+            autoSelected: 'pan',
+            show: false
+        },
+        zoom: {
+            enabled: true
+        }
+    },
+    plotOptions: {
+        candlestick: {
+            wick: {
+                useFillColor: true,
+            }
+        }
+    }}
+
+
 
 const CandleStickChart = () => {
 
@@ -28,6 +49,10 @@ const CandleStickChart = () => {
         dispatch(getCandleStickData(oneMinTimeFrame));
     },[])
 
+    useEffect(()=>{
+        console.log(OHLC)
+    },[OHLC])
+
     return (
         <div >
 
@@ -41,27 +66,16 @@ const CandleStickChart = () => {
                 </select>
             </div>
             <div className='container'>
-
-                <IgrFinancialChart
-                    width="100%"
-                    height="100%"
-                    isToolbarVisible={false}
-                    chartType="Candle"
-                    titleAlignment="Left"
-                    titleLeftMargin="25"
-                    titleTopMargin="10"
-                    titleBottomMargin="10"
-                    subtitleAlignment="Left"
-                    subtitleLeftMargin="25"
-                    subtitleTopMargin="5"
-                    subtitleBottomMargin="10"
-                    yAxisLabelLocation="OutsideLeft"
-                    yAxisMode="Numeric"
-                    yAxisTitleLeftMargin="10"
-                    yAxisTitleRightMargin="5"
-                    yAxisLabelLeftMargin="0"
-                    zoomSliderType="None"
-                    dataSource={OHLC}            
+                <Chart
+                    options={options}
+                    series={
+                        [{
+                            data:OHLC
+                        }]
+                    }
+                    type='candlestick'
+                    width='1000' 
+                    height='500'
                 />
             </div>
         </div>

@@ -12,12 +12,12 @@ const setOHLCData = payload=>{
 export const formatData  =(payload) =>dispatch => {
     let formatedData = payload?.map(data=>{
         return {
-            Date: new Date(data[0]),
-            Open: data[1],
-            High: data[2],
-            Low: data[3],
-            Close: data[4],
-            Volume: data[5]
+            x:new Date(data[0]).toLocaleString('en-GB',{timezone:'Asia/Kolkata'}),
+            y:[data[1],
+                data[2],
+                data[3],
+                data[4],]
+            
         };
     });
     dispatch(setOHLCData(formatedData));
