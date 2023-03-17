@@ -6,7 +6,13 @@ import {
     setOrderBookdata,
     setOrderBookSocketCreated,
 } from '../Redux/orderBook/action';
-// import { useDispatch, useSelector } from 'react-redux';
+
+const constanIndex ={
+    count:1,
+    amount:2,
+    total:3,
+    price:0
+}
 
 const OrderBook = () => {
     const dispatch = useDispatch();
@@ -101,11 +107,11 @@ const OrderBook = () => {
                     <tbody>
                        
                         {asks?.map((arr) => (
-                            <tr key = {arr[3]}>
-                                <td>{arr[1]}</td>
-                                <td>{arr[2].toFixed(4)}</td>
-                                <td>{arr[3].toFixed(4)}</td>
-                                <td>{arr[0]}</td>
+                            <tr key = {arr[constanIndex?.total]}>
+                                <td>{arr[constanIndex?.count]}</td>
+                                <td>{arr[constanIndex?.amount].toFixed(4)}</td>
+                                <td>{arr[constanIndex?.total].toFixed(4)}</td>
+                                <td>{arr[constanIndex?.price]}</td>
                             </tr>
                         ))}
                     </tbody>
