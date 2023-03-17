@@ -119,8 +119,6 @@ const CandleStickChart = () => {
                     height='500'
                 />
             </div>
-
-            <Select  value='1m' options={timeFrames} onChange={handleTimeFrameChange}/>
         </div>
     );
 };
