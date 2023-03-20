@@ -99,50 +99,50 @@ const OrderBook = () => {
     }
 
 
-    const updataAskAndBid = (data)=>{
-        const COUNT_INDEX = 1 , PRICE_INDEX = 0, AMOUNT_INDEX = 2
-        const asks = asksData
-        const bids = bidsData
+    // const updataAskAndBid = (data)=>{
+    //     const COUNT_INDEX = 1 , PRICE_INDEX = 0, AMOUNT_INDEX = 2
+    //     const asks = asksData
+    //     const bids = bidsData
        
         
-        if(data[COUNT_INDEX] > 0){
-            if(data[AMOUNT_INDEX] > 0){
-                bids[data[PRICE_INDEX]] = [data[COUNT_INDEX], data[AMOUNT_INDEX]]
-            }else if(data[AMOUNT_INDEX] < 0){
-                asks[data[PRICE_INDEX]] = [data[COUNT_INDEX], Math.abs(data[AMOUNT_INDEX])]
-            }
-        }
-        else {
-            if(data[AMOUNT_INDEX] === 1){
-                delete bids[ data[PRICE_INDEX]  ]
-            }
-            else if(data[AMOUNT_INDEX] === -1){
-                delete asks[data[PRICE_INDEX]]
-            }
-        }
+    //     if(data[COUNT_INDEX] > 0){
+    //         if(data[AMOUNT_INDEX] > 0){
+    //             bids[data[PRICE_INDEX]] = [data[COUNT_INDEX], data[AMOUNT_INDEX]]
+    //         }else if(data[AMOUNT_INDEX] < 0){
+    //             asks[data[PRICE_INDEX]] = [data[COUNT_INDEX], Math.abs(data[AMOUNT_INDEX])]
+    //         }
+    //     }
+    //     else {
+    //         if(data[AMOUNT_INDEX] === 1){
+    //             delete bids[ data[PRICE_INDEX]  ]
+    //         }
+    //         else if(data[AMOUNT_INDEX] === -1){
+    //             delete asks[data[PRICE_INDEX]]
+    //         }
+    //     }
                
-        const ASKS_KEYS = Object?.keys(asks)
-        const BIDS_KEYS = Object?.keys(bids)?.reverse()
+    //     const ASKS_KEYS = Object?.keys(asks)
+    //     const BIDS_KEYS = Object?.keys(bids)?.reverse()
 
-        const ASK_SUM_LIST = getAListOfSum(ASKS_KEYS,asks)
-        const BID_SUM_LIST = getAListOfSum(BIDS_KEYS, bids)
+    //     const ASK_SUM_LIST = getAListOfSum(ASKS_KEYS,asks)
+    //     const BID_SUM_LIST = getAListOfSum(BIDS_KEYS, bids)
 
         
-        setObjKeys({
-            asksKeys:ASKS_KEYS,
-            bidsKeys:BIDS_KEYS
-        })
+    //     setObjKeys({
+    //         asksKeys:ASKS_KEYS,
+    //         bidsKeys:BIDS_KEYS
+    //     })
         
-        setAsksData({...asks})
-        setBidsData({...bids})
+    //     setAsksData({...asks})
+    //     setBidsData({...bids})
 
-        setListOfSum({
-            asksSum:ASK_SUM_LIST,
-            bidSum:BID_SUM_LIST
-        })
+    //     setListOfSum({
+    //         asksSum:ASK_SUM_LIST,
+    //         bidSum:BID_SUM_LIST
+    //     })
         
         
-    }
+    // }
 
     const connect = ()=> {
 
