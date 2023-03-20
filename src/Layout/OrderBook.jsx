@@ -20,27 +20,28 @@ const OrderBook = () => {
     
     const SOCKET_URL = 'wss://api-pub.bitfinex.com/ws/2'
 
+    const getAListOfSum = (keys, arr)=>{
+
+        const listOfSum =[]
+
+        keys?.forEach((price, index)=>{
+            if(index === 0){
+                listOfSum.push(arr[price][1])
+            }else{
+                listOfSum.push((arr[price][1] + listOfSum[index-1]) )
+            }
+        })
+
+        return listOfSum
+
+    }
+
 
     const updataAskAndBid = (data)=>{
         const COUNT_INDEX = 1 , PRICE_INDEX = 0, AMOUNT_INDEX = 2
         const asks = asksData
         const bids = bidsData
-
-        const getAListOfSum = (keys, arr)=>{
-
-            const listOfSum =[]
-
-            keys?.forEach((price, index)=>{
-                if(index === 0){
-                    listOfSum.push(arr[price][1])
-                }else{
-                    listOfSum.push((arr[price][1] + listOfSum[index-1]) )
-                }
-            })
-
-            return listOfSum
-
-        }
+       
         
         if(data[COUNT_INDEX] > 0){
             if(data[AMOUNT_INDEX] > 0){
