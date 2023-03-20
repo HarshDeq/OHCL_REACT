@@ -1,3 +1,23 @@
+
+@keyframes bacgroundFillGreen {
+    0% {
+        background-color: green;
+    }
+    100% {
+        background-color: none;
+    }
+}
+
+@keyframes bacgroundFillRed {
+    0% {
+        background-color: red;
+    }
+    100% {
+        background-color: none;
+    }
+}
+
+
 .header-container{
 
     display: flex;
@@ -67,4 +87,14 @@ th, td {
 
   .green{
     color: green;
+  }
+
+
+
+  .bid-animation{
+    animation: bacgroundFillGreen 1s ease-out 0.75s;
+  }
+
+  .ask-animation{
+    animation: bacgroundFillRed 1s ease-out 0.75s;
   }

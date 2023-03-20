@@ -144,7 +144,7 @@ const OrderBook = () => {
                     <tbody>
                        
                         {objKeys?.bidsKeys?.map((price, index) => (
-                            <tr key ={price}>
+                            <tr key ={price} className='bid-animation'>
                                 <td>{bidsData[price][0]}</td>
                                 <td>
                                     {bidsData[price][1]}
@@ -177,7 +177,7 @@ const OrderBook = () => {
                     <tbody>
                        
                         {objKeys?.asksKeys?.map((price, index) => (
-                            <tr key ={price}>
+                            <tr key ={price} className='ask-animation'>
                                 <td>
                                     {price}
                                 </td>
