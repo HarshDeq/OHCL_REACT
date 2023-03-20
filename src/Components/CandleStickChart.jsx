@@ -1,31 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {  getCandleStickData } from '../Redux/OHCLDATA/action';
+import React from 'react';
 import Chart from 'react-apexcharts';
 
-const oneMinTimeFrame = '1m'
-const timeFrames = ['1m', '30m','1h','6h','12h','1D','1W', '1M']
+const CandleStickChart = (props) => {
 
 
+    const {data, mouseEvents={}} = props
 
-
-const CandleStickChart = () => {
-
-    const mouseMoveEvent = (event, chartContext,config)=>{
-        console.log('move')
-        console.log(event, chartContext)
-        console.log(config,'config')
-
-
-    }
 
     const options = {
         chart: {
             type: 'candlestick',
             id:'candles',
-            events:{
-                dataPointMouseEnter:mouseMoveEvent
-            },
+            events:mouseEvents,
             toolbar: {
                 autoSelected: 'pan',
                 show: false
@@ -64,6 +50,11 @@ const CandleStickChart = () => {
         },
         yaxis:{
             show:true,
+            labels:{
+                formatter:(value)=>{    
+                    return  Math.round(value)
+                }
+            }
             
         },
     
@@ -78,41 +69,16 @@ const CandleStickChart = () => {
                 }
             }
         }}
-
-    const [timeFrame,setTimeFrame] = useState('')
-    const {OHLC} = useSelector(state=>state.ohlc);
-
-    const dispatch = useDispatch();
-
-    const handleTimeFrameChange = (e) => {
-        setTimeFrame(e.target.value)
-        dispatch(getCandleStickData(e.target.value)) 
-        
-    }
-
-    useEffect(()=>{
-        setTimeFrame(oneMinTimeFrame)
-        dispatch(getCandleStickData(oneMinTimeFrame));
-    },[])
-
-    // useEffect(()=>{
-    //     console.log(OHLC)
-    // },[OHLC])
-
    
 
     return (
         <div >
 
-            <div className='candlestick-timeframe-container'>
-                <select  onChange={handleTimeFrameChange} value={timeFrame} >
-                    {timeFrames?.map(time=><option key={time} value={time}>{time}</option>)}                   
-                </select>
-            </div>
+           
             <div className='container'>
                 <Chart
                     options={options}
-                    series={[{data:OHLC}]}
+                    series={[{data}]}
                     type='candlestick'
                     width='1000' 
                     height='500'

@@ -32,6 +32,16 @@
             "error",
             "single"
         ],
-        "react/prop-types": "off"
+        "react/prop-types": "off",
+        "no-multiple-empty-lines":[
+
+            "error",
+            {"max":2,
+            "maxBOF": 2}
+        ],
+        "prefer-const": ["error", {
+            "destructuring": "any",
+            "ignoreReadBeforeAssign": false
+        }]
     }
 }

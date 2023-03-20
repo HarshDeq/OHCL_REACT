@@ -1,8 +1,8 @@
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import CandleStickChart from '../Components/CandleStickChart';
 import Header from '../Components/Header';
-import OrderBook from '../Components/OrderBook';
+import OrderBook from '../Layout/OrderBook';
+import OHLC from '../Layout/OHLC';
 import { PATH_OHLC, PATH_ORDER_BOOK } from './Paths';
 
 const AllRoutes = () => {
@@ -10,7 +10,7 @@ const AllRoutes = () => {
         <div>
             <Routes>
                 <Route path='' element={<Header />}>
-                    <Route path={PATH_OHLC} element={<CandleStickChart />} />
+                    <Route path={PATH_OHLC} element={< OHLC/>} />
 
                     <Route path = {PATH_ORDER_BOOK} element={<OrderBook />} />
                     <Route path='' element={<Navigate to={`${PATH_OHLC}`}replace />} />

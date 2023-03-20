@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 
-export const getRequest = async (url) => {
+export const getRequest = async (url,config) => {
     try{
         const response = await axios.get(
-            url,
+            url,config
         );
         return response
     }catch(err){
@@ -13,10 +13,10 @@ export const getRequest = async (url) => {
 };
 
 
-export const postRequest = async(url, requestData) =>{
+export const postRequest = async(url, requestData,config) =>{
     try{
         const response = await axios.post(
-            url,requestData
+            url,requestData,config
         );
         return response
     }catch(err){
@@ -24,10 +24,10 @@ export const postRequest = async(url, requestData) =>{
     }
 }
 
-export const putRequest = async(url, updateRequestData) =>{
+export const putRequest = async(url, updateRequestData,config) =>{
     try{
         const response = await axios.put(
-            url,updateRequestData
+            url,updateRequestData,config
         );
         return response
     }catch(err){

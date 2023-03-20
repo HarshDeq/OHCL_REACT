@@ -8,10 +8,10 @@ const Header = () => {
             <div className="header-container">
                 <div className="header-container-logo">Logo</div>
                 <div className="header-container-links-container">
-                    <Link to={`/${PATH_OHLC}`} className="header-container-links-container-link">
+                    <Link to={`${PATH_OHLC}`} className="header-container-links-container-link">
                         <div >OHLC</div>
                     </Link>
-                    <Link to={`/${PATH_ORDER_BOOK}`} className="header-container-links-container-link">
+                    <Link to={`${PATH_ORDER_BOOK}`} className="header-container-links-container-link">
                         <div >
               Order Book
                         </div>

@@ -56,3 +56,15 @@ th, td {
     border-left:2px solid black;
     height: 100;
   }
+
+  .display-flex{
+    display: flex;
+  }
+
+  .red{
+    color: red;
+  }
+
+  .green{
+    color: green;
+  }
