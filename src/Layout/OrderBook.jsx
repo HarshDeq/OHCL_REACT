@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import BarChart from '../Components/BarChart'
 import { fixedFloatNumber } from '../utils/utilsForNumber'
 
 const OrderBook = () => {
@@ -34,6 +35,66 @@ const OrderBook = () => {
         })
 
         return listOfSum
+
+    }
+
+    const updateAsks = (data) =>{
+        const COUNT_INDEX = 1 , PRICE_INDEX = 0, AMOUNT_INDEX = 2
+        const asks = asksData
+        if(data[COUNT_INDEX] > 0){
+            asks[data[PRICE_INDEX]] = [data[COUNT_INDEX], Math.abs(data[AMOUNT_INDEX])]
+        }
+        else {
+            delete asks[data[PRICE_INDEX]]
+        }
+
+        const ASKS_KEYS = Object?.keys(asks)
+        const ASK_SUM_LIST = getAListOfSum(ASKS_KEYS,asks)
+
+        setObjKeys(prevSate=>({
+            ...prevSate,
+            asksKeys:ASKS_KEYS,
+        }))
+
+        setAsksData({...asks})
+
+        setListOfSum(prevSate=>({
+            ...prevSate,
+            asksSum:ASK_SUM_LIST
+        }))
+    }
+
+
+    const updateBids = (data)=>{
+
+        const COUNT_INDEX = 1 , PRICE_INDEX = 0, AMOUNT_INDEX = 2
+        const bids = bidsData
+       
+        
+        if(data[COUNT_INDEX] > 0){
+            bids[data[PRICE_INDEX]] = [data[COUNT_INDEX], data[AMOUNT_INDEX]]
+        }
+        else {
+            delete bids[ data[PRICE_INDEX]  ]
+        }
+               
+        const BIDS_KEYS = Object?.keys(bids)?.reverse()
+
+        const BID_SUM_LIST = getAListOfSum(BIDS_KEYS, bids)
+
+        
+        setObjKeys(prevSate=>({
+            ...prevSate,
+            bidsKeys:BIDS_KEYS
+        }))
+        
+        setBidsData({...bids})
+
+        setListOfSum(prevSate=>({
+            ...prevSate,
+            bidSum:BID_SUM_LIST
+        }))
+        
 
     }
 
@@ -103,16 +164,27 @@ const OrderBook = () => {
         socket.onmessage=(e)=>{
             const orderBookData = JSON.parse(e.data)[1]
 
+            const AMOUNT_INDEX = 2
 
             if(orderBookData?.length === 50){
 
                 
                 orderBookData?.forEach((data)=>{
-                    updataAskAndBid(data)
+                    if(data[AMOUNT_INDEX] > 0){
+                        updateBids(data)
+                    }else{
+                        updateAsks(data)
+                    }
+                    // updataAskAndBid(data)
                 })
             }
             else if(orderBookData?.length === 3){
-                updataAskAndBid(orderBookData)
+                if(orderBookData[AMOUNT_INDEX] > 0){
+                    updateBids(orderBookData)
+                }else{
+                    updateAsks(orderBookData)
+                }
+                // updataAskAndBid(orderBookData)
             }
 
 
@@ -133,8 +205,11 @@ const OrderBook = () => {
 
     return (
         <div className="oder-book-conatiner">
-            <div>
-                <table>
+            <div className='position-relative'>
+                <div className='position-absolute'>
+                    <BarChart  data = {listOfSum?.bidSum} reversed={true}/>
+                </div>
+                <table style={{zIndex:4}}>
                     <thead>
                         <tr>
                             <th>Count</th>
@@ -166,7 +241,10 @@ const OrderBook = () => {
                 </table>
             </div>
             <div className='vertical-line'></div>
-            <div>
+            <div className='position-relative'>
+                <div className='position-absolute'>
+                    <BarChart  data = {listOfSum?.asksSum} reversed={false} barColor = '#FF0000'/>
+                </div>
                 <table>
                     <thead>
                         <tr>
@@ -198,7 +276,6 @@ const OrderBook = () => {
                     </tbody>
                 </table>
             </div>
-
         </div>
     )
 }
