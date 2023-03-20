@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { fixedFloatNumber } from '../utils/utilsForNumber'
 
 const OrderBook = () => {
 
@@ -148,10 +149,10 @@ const OrderBook = () => {
                             <tr key ={price} className='bid-animation'>
                                 <td>{bidsData[price][0]}</td>
                                 <td>
-                                    {bidsData[price][1]}
+                                    {fixedFloatNumber(bidsData[price][1],5)}
                                 </td>
                                 <td>
-                                    {listOfSum?.bidSum[index]}
+                                    {fixedFloatNumber(listOfSum?.bidSum[index],4)}
 
                                 </td>
                                 <td>
@@ -183,11 +184,11 @@ const OrderBook = () => {
                                     {price}
                                 </td>
                                 <td>
-                                    {listOfSum?.asksSum[index]}
+                                    {fixedFloatNumber(listOfSum?.asksSum[index],4)}
 
                                 </td>
                                 <td>
-                                    {asksData[price][1]}
+                                    {fixedFloatNumber(asksData[price][1],5)}
                                 </td>
                                 <td>{asksData[price][0]}</td>
 
