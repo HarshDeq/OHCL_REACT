@@ -48,6 +48,7 @@ const OHLC = () => {
             });
 
             setOhlcChartData(formatedData);
+<<<<<<< HEAD
 
             const INDEX_OF_LATEST_DATA_BY_DATE = 0;
            
@@ -55,6 +56,13 @@ const OHLC = () => {
             const LAST_ARR = formatedData[INDEX_OF_LATEST_DATA_BY_DATE].y;
             console.log(formatedData)
 
+=======
+
+            const LAST_INDEX_OF_FORMATED_DATA = formatedData?.length - 1;
+
+            const LAST_ARR = formatedData[LAST_INDEX_OF_FORMATED_DATA].y;
+
+>>>>>>> 200bcbfa484aa8a1f0d6647077dfda9fe5e7638e
             setOHLC({
                 O: LAST_ARR[0],
                 H: LAST_ARR[1],
