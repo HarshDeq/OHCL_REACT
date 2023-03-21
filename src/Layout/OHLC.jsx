@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import CandleStickChart from '../Components/CandleStickChart'
+import CustomChart from '../Components/Chart'
 import Select from '../Components/Select'
 import { getRequest } from '../utils/axios'
 
@@ -59,22 +59,104 @@ const OHLC = () => {
         })
     }
 
-    const mouseMove = ()=>{
-        const PARENT_CLASS = 'apexcharts-tooltip-candlestick'
 
-        const allChildElements = document.getElementsByClassName(PARENT_CLASS)[0].childNodes
+    const options = {
+        chart: {
+            type: 'candlestick',
+            id:'candles',
+            events:{
+                mouseMove:()=>{
+                    const PARENT_CLASS = 'apexcharts-tooltip-candlestick'
+            
+                    const allChildElements = document.getElementsByClassName(PARENT_CLASS)[0].childNodes
+                    
+                    const OHLCData = []
+                    allChildElements?.forEach(ele=>{
+                        OHLCData.push(
+            
+                            ele.childNodes[1].innerHTML
+                        )
+                    })
+                    
+                   
+                    setOHLC({O:OHLCData[0],H:OHLCData[1],L:OHLCData[2],C:OHLCData[3]})
+                }
+            },
+            toolbar: {
+                autoSelected: 'pan',
+                show: false
+            },
+            zoom: {
+                enabled: true
+            }
+        },
+    
+        xaxis:{
+            type:'datetime',
+            datetimeUTC: true,
+            datetimeFormatter: {
+                year: 'yyyy',
+                month: 'MMM \'yy',
+                day: 'dd MMM',
+                hour: 'HH:mm',
+            },
+    
+            axisBorder: {
+                show: true,
+                color: '#78909C',
+                height: 1,
+                width: '100%',
+                offsetX: 0,
+                offsetY: 0
+            },
+            axisTicks: {
+                show: true,
+                borderType: 'solid',
+                color: '#78909C',
+                height: 6,
+                offsetX: 0,
+                offsetY: 0
+            },
+        },
+        yaxis:{
+            show:true,
+            labels:{
+                formatter:(value)=>{    
+                    return  Math.round(value)
+                }
+            }
+            
+        },
+    
+        plotOptions: {
+            candlestick: {
+                colors: {
+                    upward: '#00B746',
+                    downward: '#EF403C'
+                },
+                wick: {
+                    useFillColor: true
+                }
+            }
+        }}
+
+
+    // const mouseMove = ()=>{
+    //     const PARENT_CLASS = 'apexcharts-tooltip-candlestick'
+
+    //     const allChildElements = document.getElementsByClassName(PARENT_CLASS)[0].childNodes
         
-        const OHLCData = []
-        allChildElements?.forEach(ele=>{
-            OHLCData.push(
+    //     const OHLCData = []
+    //     allChildElements?.forEach(ele=>{
+    //         OHLCData.push(
 
-                ele.childNodes[1].innerHTML
-            )
-        })
+    //             ele.childNodes[1].innerHTML
+    //         )
+    //     })
         
        
-        setOHLC({O:OHLCData[0],H:OHLCData[1],L:OHLCData[2],C:OHLCData[3]})
-    }
+    //     setOHLC({O:OHLCData[0],H:OHLCData[1],L:OHLCData[2],C:OHLCData[3]})
+    // }
 
     useEffect(()=>{
 
@@ -94,7 +176,16 @@ const OHLC = () => {
                 <div><span>C :</span><span>{ohlc?.C}</span></div>
             </div>
 
-            {ohlcCharData?.length> 0&&  <CandleStickChart data = {ohlcCharData}  mouseEvents ={{mouseMove}} />}
+            {ohlcCharData?.length> 0&&  
+            
+            <div >
+
+                <div className='container'>
+                    <CustomChart data = {ohlcCharData}  options = {options} type='candlestick' height='500' width = '1000' />
+           
+                </div>
+            </div>
+            }
 
 
         </div>

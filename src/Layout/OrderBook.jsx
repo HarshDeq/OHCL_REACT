@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import BarChart from '../Components/BarChart'
+import CustomChart from '../Components/Chart'
 import { fixedFloatNumber } from '../utils/utilsForNumber'
 
 const OrderBook = () => {
@@ -198,6 +198,115 @@ const OrderBook = () => {
     }
 
 
+    const bidsOptions = {
+        chart: {
+            toolbar:{
+                show:false
+            },
+            height: 410,
+            animations: {
+                enabled: true
+            },
+          
+        },
+        plotOptions: {
+            bar: {
+                horizontal: true,
+                barHeight: '100',
+                columnWidth: '100%',
+            },
+        },
+
+        tooltip:{
+            enabled:false
+        },
+        dataLabels:{
+            enabled:false,
+        },
+
+        stroke: {
+            show:false,
+            width:0
+        },
+       
+        yaxis: {
+            reversed: true,
+          
+            labels: {
+                show: false
+            },
+        },
+        xaxis:{
+            labels: {
+                show: false
+            },
+        },
+        grid: {
+            position: 'back',
+           
+        },
+        fill: {
+            colors: ['#00FF00'],
+            opacity:.5
+        }
+     
+    };
+
+    const asksOptions = {
+        chart: {
+            toolbar:{
+                show:false
+            },
+            height: 410,
+            animations: {
+                enabled: true
+            },
+          
+        },
+        plotOptions: {
+            bar: {
+                horizontal: true,
+                barHeight: '100',
+                columnWidth: '100%',
+            },
+        },
+
+        tooltip:{
+            enabled:false
+        },
+        dataLabels:{
+            enabled:false,
+        },
+
+        stroke: {
+            show:false,
+            width:0
+        },
+       
+        yaxis: {
+            reversed: false,
+          
+            labels: {
+                show: false
+            },
+        },
+        xaxis:{
+            labels: {
+                show: false
+            },
+        },
+        grid: {
+            position: 'back',
+           
+        },
+        fill: {
+            colors: ['#FF0000'],
+            opacity:.5
+        }
+     
+    };
+
+
     useEffect(()=>{
         connect()
     },[])
@@ -207,7 +316,7 @@ const OrderBook = () => {
         <div className="oder-book-conatiner">
             <div className='position-relative'>
                 <div className='position-absolute'>
-                    <BarChart  data = {listOfSum?.bidSum} reversed={true}/>
+                    <CustomChart  data = {listOfSum?.bidSum} options = {bidsOptions} type='bar' height='100%' width='100%' />
                 </div>
                 <table style={{zIndex:4}}>
                     <thead>
@@ -243,7 +352,7 @@ const OrderBook = () => {
             <div className='vertical-line'></div>
             <div className='position-relative'>
                 <div className='position-absolute'>
-                    <BarChart  data = {listOfSum?.asksSum} reversed={false} barColor = '#FF0000'/>
+                    <CustomChart  data = {listOfSum?.asksSum} options = {asksOptions} type='bar' height='100%' width='100%' />
                 </div>
                 <table>
                     <thead>
