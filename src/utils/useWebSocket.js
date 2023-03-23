@@ -3,19 +3,18 @@ import  { useEffect, useRef, useState } from 'react'
 const useWebSocket = (url) => {
 
     const [isOpen,setOpen] = useState(false)
-    const [response,setResponse] = useState(null)
-    const ws = useRef(null);
+    const [socket,setSocket] = useState(null)
+
 
     useEffect(()=>{
-        const socket = new WebSocket(url);
+       setSocket(new WebSocket(url))
        
         socket.onopen = () => setOpen(true);
         socket.onclose = () => {
             console.log('close')
             setOpen(false)
         };
-        socket.onmessage = (event) => setResponse(JSON.parse(event.data));
-        ws.current = socket;
+      
         
         return () => {
             if(socket){
@@ -27,7 +26,7 @@ const useWebSocket = (url) => {
     },[])
 
 
-    return [isOpen, response,ws.current?.send.bind(ws.current)];
+    return [isOpen, socket];
 }
 
 export default useWebSocket

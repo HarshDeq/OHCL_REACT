@@ -60,6 +60,18 @@ const OrderBook = () => {
             bidSum: BID_SUM_LIST,
         }));
     };
+
+    const updateOrderBookBasedOnAmount = (order)=>{
+        const DEFAULT_COMPARISON_AMOUNT = 0
+        const AMOUNT_INDEX = 2;
+
+        if (order[AMOUNT_INDEX] > DEFAULT_COMPARISON_AMOUNT) {
+            updateBids(order);
+        } else {
+            updateAsks(order);
+        }
+
+    }
   
 
     useEffect(() => {
@@ -72,8 +84,8 @@ const OrderBook = () => {
             event: 'subscribe',
             channel: 'book',
             symbol: 'tBTCUSD',
-            prec: 'P0',
-            freq:'F0'
+            prec: 'P1',
+            freq:'F1'
         });
 
         SOCKET.onopen = () => {
@@ -81,28 +93,19 @@ const OrderBook = () => {
         };
 
         SOCKET.onmessage = (e) => {
-            const AMOUNT_INDEX = 2;
             const INITIAL_LENGTH_OF_ORDER_BOOK = 50
-            const INDEX_OF_ORDER_IN_RESPONSE = 1
             const LENGTH_OF_ONE_ORDER = 3
+            const INDEX_OF_ORDER_IN_RESPONSE = 1
                 
             const orderBookData = JSON.parse(e.data)[INDEX_OF_ORDER_IN_RESPONSE];
 
 
             if (orderBookData?.length === INITIAL_LENGTH_OF_ORDER_BOOK) {
-                orderBookData?.forEach((data) => {
-                    if (data[AMOUNT_INDEX] > 0) {
-                        updateBids(data);
-                    } else {
-                        updateAsks(data);
-                    }
+                orderBookData?.forEach((order) => {
+                    updateOrderBookBasedOnAmount( order)
                 });
             } else if (orderBookData?.length === LENGTH_OF_ONE_ORDER) {
-                if (orderBookData[AMOUNT_INDEX] > 0) {
-                    updateBids(orderBookData);
-                } else {
-                    updateAsks(orderBookData);
-                }
+                updateOrderBookBasedOnAmount(orderBookData)
             }
         };
     

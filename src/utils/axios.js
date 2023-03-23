@@ -3,9 +3,10 @@ import axios from 'axios';
 export const getRequest = async (url, config) => {
     try {
         const response = await axios.get(url, config);
+        // console.log(response)
         return response;
     } catch (err) {
-        console.log(err);
+        console.log(err.response.status);
     }
 };
 
