@@ -1,30 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import CustomChart from '../Components/Chart';
 import Select from '../Components/Select';
-import { getRequest } from '../utils/axios';
-
-const TIME_FRAMES = ['1m', '30m', '1h', '6h', '12h', '1D', '1W', '1M'];
-
-const BASE_URL = 'https://api-pub.bitfinex.com/v2/';
+import Spinner from '../Components/Spinner';
+import { TIME_STAMPS, TIME_STAMPS_LABELS } from '../utils/constants';
+import { dateFormater } from '../utils/formatter';
+import { getCurrentTimeStamp } from '../utils/getCurrentTimeStamp';
+import { ohlcChartDataPromise } from '../utils/getOHLCChartData';
+import { getTimeFrame } from '../utils/getTimeFrame';
 
 const OHLC = () => {
-    const [timeFrame, setTimeFrame] = useState('1m');
-    const [ohlcCharData, setOhlcChartData] = useState([]);
-    const [ohlc, setOHLC] = useState({
-        O: 0,
-        H: 0,
-        L: 0,
-        C: 0,
-    });
+    const [timeStamp, setTimeStamp] = useState(TIME_STAMPS.oneHour);
 
-    const handleTimeFrameChange = (e) => {
-        setTimeFrame(e.target.value);
+    const [ohlcCharData, setOhlcChartData] = useState([]);
+    // const [ohlc, setOHLC] = useState({
+    //     O: 0,
+    //     H: 0,
+    //     L: 0,
+    //     C: 0,
+    // });
+
+    const handleTimeStampChange = (e) => {
+        setTimeStamp(Number(e.target.value));
     };
 
     const getOHLCData = () => {
-        const response = getRequest(
-            `${BASE_URL}/candles/trade%3A${timeFrame}%3AtBTCUSD/hist?limit=75`
-        );
+        const currentTimeStamp = getCurrentTimeStamp();
+        const diffInTimeStamp = currentTimeStamp - timeStamp;
+
+        const timeFrame = getTimeFrame(timeStamp);
+
+        const response = ohlcChartDataPromise(timeFrame, diffInTimeStamp);
 
         response.then((res) => {
             const CONSTANTINDEX = {
@@ -47,20 +52,20 @@ const OHLC = () => {
                 };
             });
 
-            setOhlcChartData(formatedData);
+            const reveresFormatedData = formatedData.reverse();
 
-            const INDEX_OF_LATEST_DATA_BY_DATE = 0;
-           
-            
-            const LAST_ARR = formatedData[INDEX_OF_LATEST_DATA_BY_DATE].y;
-            console.log(formatedData)
+            setOhlcChartData(reveresFormatedData);
 
-            setOHLC({
-                O: LAST_ARR[0],
-                H: LAST_ARR[1],
-                L: LAST_ARR[2],
-                C: LAST_ARR[3],
-            });
+            // const INDEX_OF_LATEST_DATA_BY_DATE = 0;
+
+            // const LAST_ARR = formatedData[INDEX_OF_LATEST_DATA_BY_DATE].y;
+
+            // setOHLC({
+            //     O: LAST_ARR[0],
+            //     H: LAST_ARR[1],
+            //     L: LAST_ARR[2],
+            //     C: LAST_ARR[3],
+            // });
         });
     };
 
@@ -69,27 +74,28 @@ const OHLC = () => {
             type: 'candlestick',
             id: 'candles',
             events: {
-                mouseMove: () => {
-                    const PARENT_CLASS = 'apexcharts-tooltip-candlestick';
+                click: (event, chartContext, config) => {
+                    //         const PARENT_CLASS = 'apexcharts-tooltip-candlestick';
 
-                    const allChildElements =
-            document.getElementsByClassName(PARENT_CLASS)[0].childNodes;
+                    //         const allChildElements =
+                    // document.getElementsByClassName(PARENT_CLASS)[0].childNodes;
 
-                    const OHLCData = [];
-                    allChildElements?.forEach((ele) => {
-                        OHLCData.push(ele.childNodes[1].innerHTML);
-                    });
+                    //         const OHLCData = [];
+                    //         allChildElements?.forEach((ele) => {
+                    //             OHLCData.push(ele.childNodes[1].innerHTML);
+                    //         });
 
-                    setOHLC({
-                        O: OHLCData[0],
-                        H: OHLCData[1],
-                        L: OHLCData[2],
-                        C: OHLCData[3],
-                    });
+                    //         setOHLC({
+                    //             O: OHLCData[0],
+                    //             H: OHLCData[1],
+                    //             L: OHLCData[2],
+                    //             C: OHLCData[3],
+                    //         });
+
+                    console.log(config);
                 },
             },
             toolbar: {
-                autoSelected: 'pan',
                 show: false,
             },
             zoom: {
@@ -98,8 +104,8 @@ const OHLC = () => {
         },
 
         xaxis: {
-            type: 'datetime',
-            datetimeUTC: true,
+            type: 'category',
+            datetimeUTC: false,
             datetimeFormatter: {
                 year: 'yyyy',
                 month: 'MMM \'yy',
@@ -123,12 +129,28 @@ const OHLC = () => {
                 offsetX: 0,
                 offsetY: 0,
             },
+            labels: {
+                rotate: -45,
+                formatter: function (value) {
+                    return dateFormater(value);
+                },
+                style: {
+                    colors: '#FFFFFF',
+                    fontSize: '10px',
+                    fontFamily: 'Helvetica, Arial, sans-serif',
+                    fontWeight: 400,
+                    cssClass: 'apexcharts-yaxis-label',
+                },
+            },
         },
         yaxis: {
             show: true,
             labels: {
                 formatter: (value) => {
                     return Math.round(value);
+                },
+                style: {
+                    colors: '#FFFFFF',
                 },
             },
         },
@@ -144,39 +166,35 @@ const OHLC = () => {
                 },
             },
         },
+        tooltip: {
+            enabled: false,
+            fixed: {
+                enabled: true,
+                position: 'topRight',
+                offsetX: 0,
+                offsetY: 0,
+            },
+        },
     };
-
-    // const mouseMove = ()=>{
-    //     const PARENT_CLASS = 'apexcharts-tooltip-candlestick'
-
-    //     const allChildElements = document.getElementsByClassName(PARENT_CLASS)[0].childNodes
-
-    //     const OHLCData = []
-    //     allChildElements?.forEach(ele=>{
-    //         OHLCData.push(
-
-    //             ele.childNodes[1].innerHTML
-    //         )
-    //     })
-
-    //     setOHLC({O:OHLCData[0],H:OHLCData[1],L:OHLCData[2],C:OHLCData[3]})
-    // }
 
     useEffect(() => {
         getOHLCData();
-    }, [timeFrame]);
+    }, [timeStamp]);
 
     return (
         <div>
-            <div className="candlestick-timeframe-container">
-                <Select
-                    value={timeFrame}
-                    options={TIME_FRAMES}
-                    onChange={handleTimeFrameChange}
-                />
-            </div>
-            <div
-                className={`display-flex red ${ohlc?.O >= ohlc?.C ? 'red' : 'green'}`}
+            {ohlcCharData?.length ? (
+                <>
+                    <div className="candlestick-timeframe-container">
+                        <label className="color-white">Select Time :&nbsp;</label>
+                        <Select
+                            value={timeStamp}
+                            options={TIME_STAMPS_LABELS}
+                            onChange={handleTimeStampChange}
+                        />
+                    </div>
+                    {/* <div
+                className={`display-flex red ${ohlc?.O >= ohlc?.C ? 'red' : 'green'} candlestick-timeframe-container`}
             >
                 <div>
                     <span>O :</span>
@@ -194,20 +212,24 @@ const OHLC = () => {
                     <span>C :</span>
                     <span>{ohlc?.C}</span>
                 </div>
-            </div>
+            </div> */}
 
-            {ohlcCharData?.length > 0 && (
-                <div>
-                    <div className="container">
-                        <CustomChart
-                            data={ohlcCharData}
-                            options={options}
-                            type="candlestick"
-                            height="500"
-                            width="1000"
-                        />
-                    </div>
-                </div>
+                    {ohlcCharData?.length > 0 && (
+                        <div>
+                            <div className="container">
+                                <CustomChart
+                                    data={ohlcCharData}
+                                    options={options}
+                                    type="candlestick"
+                                    height="400"
+                                    width="1000"
+                                />
+                            </div>
+                        </div>
+                    )}
+                </>
+            ) : (
+                <Spinner />
             )}
         </div>
     );

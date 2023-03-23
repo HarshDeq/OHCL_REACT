@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import CustomChart from '../Components/Chart';
-import { fixedFloatNumber } from '../utils/utilsForNumber';
+import AsksOrderBookTable from '../Components/AsksOrderBookTable';
+import BidOrderBookTable from '../Components/BidOrderBookTable';
+import Spinner from '../Components/Spinner';
+import { getListOfSumOFOrderBook, updateAsksOrderBook, updateBidsOrderBook } from '../utils/OrderBook';
 
 const OrderBook = () => {
-    const [asksData, setAsksData] = useState({});
-    const [bidsData, setBidsData] = useState({});
+    const [asksOrderBook, setAsksOrderBook] = useState({});
+    const [bidsOrderBook, setBidsOrderBook] = useState({});
 
-    const [objKeys, setObjKeys] = useState({
+    // const [open, response, socket] = useWebSocket(WEB_SOCKET_BASE_URL)
+
+    const [orderBookKeys, setOrderBookKeys] = useState({
         asksKeys: [],
         bidsKeys: [],
     });
@@ -16,45 +20,20 @@ const OrderBook = () => {
         bidSum: [],
     });
 
-    const SOCKET_URL = 'wss://api-pub.bitfinex.com/ws/2';
 
-    const getAListOfSum = (keys, arr) => {
-        const listOfSum = [];
-
-        keys?.forEach((price, index) => {
-            if (index === 0) {
-                listOfSum.push(arr[price][1]);
-            } else {
-                listOfSum.push(arr[price][1] + listOfSum[index - 1]);
-            }
-        });
-
-        return listOfSum;
-    };
-
-    const updateAsks = (data) => {
-        const COUNT_INDEX = 1,
-            PRICE_INDEX = 0,
-            AMOUNT_INDEX = 2;
-        const asks = asksData;
-        if (data[COUNT_INDEX] > 0) {
-            asks[data[PRICE_INDEX]] = [
-                data[COUNT_INDEX],
-                Math.abs(data[AMOUNT_INDEX]),
-            ];
-        } else {
-            delete asks[data[PRICE_INDEX]];
-        }
+    const updateAsks = (newOrder) => {
+       
+        const asks = updateAsksOrderBook(asksOrderBook,newOrder);
 
         const ASKS_KEYS = Object?.keys(asks);
-        const ASK_SUM_LIST = getAListOfSum(ASKS_KEYS, asks);
+        const ASK_SUM_LIST = getListOfSumOFOrderBook(ASKS_KEYS, asks);
 
-        setObjKeys((prevSate) => ({
+        setOrderBookKeys((prevSate) => ({
             ...prevSate,
             asksKeys: ASKS_KEYS,
         }));
 
-        setAsksData({ ...asks });
+        setAsksOrderBook({ ...asks });
 
         setListOfSum((prevSate) => ({
             ...prevSate,
@@ -62,292 +41,141 @@ const OrderBook = () => {
         }));
     };
 
-    const updateBids = (data) => {
-        const COUNT_INDEX = 1,
-            PRICE_INDEX = 0,
-            AMOUNT_INDEX = 2;
-        const bids = bidsData;
-
-        if (data[COUNT_INDEX] > 0) {
-            bids[data[PRICE_INDEX]] = [data[COUNT_INDEX], data[AMOUNT_INDEX]];
-        } else {
-            delete bids[data[PRICE_INDEX]];
-        }
+    const updateBids = (newOrder) => {
+        const bids = updateBidsOrderBook( bidsOrderBook,newOrder);
 
         const BIDS_KEYS = Object?.keys(bids)?.reverse();
 
-        const BID_SUM_LIST = getAListOfSum(BIDS_KEYS, bids);
+        const BID_SUM_LIST = getListOfSumOFOrderBook(BIDS_KEYS, bids);
 
-        setObjKeys((prevSate) => ({
+        setOrderBookKeys((prevSate) => ({
             ...prevSate,
             bidsKeys: BIDS_KEYS,
         }));
 
-        setBidsData({ ...bids });
+        setBidsOrderBook({ ...bids });
 
         setListOfSum((prevSate) => ({
             ...prevSate,
             bidSum: BID_SUM_LIST,
         }));
     };
+  
 
-    // const updataAskAndBid = (data)=>{
-    //     const COUNT_INDEX = 1 , PRICE_INDEX = 0, AMOUNT_INDEX = 2
-    //     const asks = asksData
-    //     const bids = bidsData
+    useEffect(() => {
 
-    //     if(data[COUNT_INDEX] > 0){
-    //         if(data[AMOUNT_INDEX] > 0){
-    //             bids[data[PRICE_INDEX]] = [data[COUNT_INDEX], data[AMOUNT_INDEX]]
-    //         }else if(data[AMOUNT_INDEX] < 0){
-    //             asks[data[PRICE_INDEX]] = [data[COUNT_INDEX], Math.abs(data[AMOUNT_INDEX])]
-    //         }
-    //     }
-    //     else {
-    //         if(data[AMOUNT_INDEX] === 1){
-    //             delete bids[ data[PRICE_INDEX]  ]
-    //         }
-    //         else if(data[AMOUNT_INDEX] === -1){
-    //             delete asks[data[PRICE_INDEX]]
-    //         }
-    //     }
+        const SOCKET_URL = 'wss://api-pub.bitfinex.com/ws/2';
 
-    //     const ASKS_KEYS = Object?.keys(asks)
-    //     const BIDS_KEYS = Object?.keys(bids)?.reverse()
-
-    //     const ASK_SUM_LIST = getAListOfSum(ASKS_KEYS,asks)
-    //     const BID_SUM_LIST = getAListOfSum(BIDS_KEYS, bids)
-
-    //     setObjKeys({
-    //         asksKeys:ASKS_KEYS,
-    //         bidsKeys:BIDS_KEYS
-    //     })
-
-    //     setAsksData({...asks})
-    //     setBidsData({...bids})
-
-    //     setListOfSum({
-    //         asksSum:ASK_SUM_LIST,
-    //         bidSum:BID_SUM_LIST
-    //     })
-
-    // }
-
-    const connect = () => {
-        const socket = new WebSocket(SOCKET_URL);
+        const SOCKET = new WebSocket(SOCKET_URL);
 
         const BOOK = JSON.stringify({
             event: 'subscribe',
             channel: 'book',
             symbol: 'tBTCUSD',
-            freq: 'F0',
             prec: 'P0',
+            freq:'F0'
         });
 
-        socket.onopen = () => {
-            socket.send(BOOK);
+        SOCKET.onopen = () => {
+            SOCKET.send(BOOK);
         };
 
-        socket.onmessage = (e) => {
-            const orderBookData = JSON.parse(e.data)[1];
-
+        SOCKET.onmessage = (e) => {
             const AMOUNT_INDEX = 2;
+            const INITIAL_LENGTH_OF_ORDER_BOOK = 50
+            const INDEX_OF_ORDER_IN_RESPONSE = 1
+            const LENGTH_OF_ONE_ORDER = 3
+                
+            const orderBookData = JSON.parse(e.data)[INDEX_OF_ORDER_IN_RESPONSE];
 
-            if (orderBookData?.length === 50) {
+
+            if (orderBookData?.length === INITIAL_LENGTH_OF_ORDER_BOOK) {
                 orderBookData?.forEach((data) => {
                     if (data[AMOUNT_INDEX] > 0) {
                         updateBids(data);
                     } else {
                         updateAsks(data);
                     }
-                    // updataAskAndBid(data)
                 });
-            } else if (orderBookData?.length === 3) {
+            } else if (orderBookData?.length === LENGTH_OF_ONE_ORDER) {
                 if (orderBookData[AMOUNT_INDEX] > 0) {
                     updateBids(orderBookData);
                 } else {
                     updateAsks(orderBookData);
                 }
-                // updataAskAndBid(orderBookData)
             }
         };
+    
+        SOCKET.onclose=()=>{
+            console.log('close')
+            
+        }
 
-        return () => {
-            socket.close();
-        };
-    };
+        return ()=>{
+            SOCKET.close()
+        }
 
-    const bidsOptions = {
-        chart: {
-            toolbar: {
-                show: false,
-            },
-            height: 410,
-            animations: {
-                enabled: true,
-            },
-        },
-        plotOptions: {
-            bar: {
-                horizontal: true,
-                barHeight: '100',
-                columnWidth: '100%',
-            },
-        },
+       
+        // if(open){
+        //     socket.send(BOOK)
+        // }
 
-        tooltip: {
-            enabled: false,
-        },
-        dataLabels: {
-            enabled: false,
-        },
 
-        stroke: {
-            show: false,
-            width: 0,
-        },
-
-        yaxis: {
-            reversed: true,
-
-            labels: {
-                show: false,
-            },
-        },
-        xaxis: {
-            labels: {
-                show: false,
-            },
-        },
-        grid: {
-            position: 'back',
-        },
-        fill: {
-            colors: ['#00FF00'],
-            opacity: 0.5,
-        },
-    };
-
-    const asksOptions = {
-        chart: {
-            toolbar: {
-                show: false,
-            },
-            height: 410,
-            animations: {
-                enabled: true,
-            },
-        },
-        plotOptions: {
-            bar: {
-                horizontal: true,
-                barHeight: '100',
-                columnWidth: '100%',
-            },
-        },
-
-        tooltip: {
-            enabled: false,
-        },
-        dataLabels: {
-            enabled: false,
-        },
-
-        stroke: {
-            show: false,
-            width: 0,
-        },
-
-        yaxis: {
-            reversed: false,
-
-            labels: {
-                show: false,
-            },
-        },
-        xaxis: {
-            labels: {
-                show: false,
-            },
-        },
-        grid: {
-            position: 'back',
-        },
-        fill: {
-            colors: ['#FF0000'],
-            opacity: 0.5,
-        },
-    };
-
-    useEffect(() => {
-        connect();
     }, []);
 
+    // useEffect(()=>{
+
+    //     const AMOUNT_INDEX = 2;
+    //     const INDEX_OF_ORDER_IN_RESPONSE = 1
+    //     const LENGTH_OF_ONE_ORDER = 3
+    //     const INITIAL_LENGTH_OF_ORDER_BOOK = 50
+
+
+    //     const order = response?.[INDEX_OF_ORDER_IN_RESPONSE]
+
+    //     // console.log(order !== undefined, order)
+           
+                
+    //     if ( order?.length === INITIAL_LENGTH_OF_ORDER_BOOK) {
+    //         order?.forEach((newOrder) => {
+    //             // console.log(newOrder,"new")
+    //             if (newOrder[AMOUNT_INDEX] > 0) {
+    //                 updateBids(newOrder);
+    //             } else {
+    //                 updateAsks(newOrder);
+    //             }
+                   
+    //         });
+    //     } 
+    //     else if ( order?.length === LENGTH_OF_ONE_ORDER) {
+    //         // console.log(order,"order")
+    //         if (order[AMOUNT_INDEX] > 0) {
+    //             updateBids(order);
+    //         } else {
+    //             updateAsks(order);
+    //         }
+    //     }
+
+      
+    // },[response])
+
+
     return (
-        <div className="oder-book-conatiner">
-            <div className="position-relative">
-                <div className="position-absolute">
-                    <CustomChart
-                        data={listOfSum?.bidSum}
-                        options={bidsOptions}
-                        type="bar"
-                        height="100%"
-                        width="100%"
-                    />
-                </div>
-                <table style={{ zIndex: 4 }}>
-                    <thead>
-                        <tr>
-                            <th>Count</th>
-                            <th>Amount</th>
-                            <th>Total</th>
-                            <th>Price</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {objKeys?.bidsKeys?.map((price, index) => (
-                            <tr key={price} className="bid-animation">
-                                <td>{bidsData[price][0]}</td>
-                                <td>{fixedFloatNumber(bidsData[price][1], 5)}</td>
-                                <td>{fixedFloatNumber(listOfSum?.bidSum[index], 4)}</td>
-                                <td>{price}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-            <div className="vertical-line"></div>
-            <div className="position-relative">
-                <div className="position-absolute">
-                    <CustomChart
-                        data={listOfSum?.asksSum}
-                        options={asksOptions}
-                        type="bar"
-                        height="100%"
-                        width="100%"
-                    />
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Price</th>
-                            <th>Total</th>
-                            <th>Amount</th>
-                            <th>Count</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {objKeys?.asksKeys?.map((price, index) => (
-                            <tr key={price} className="ask-animation">
-                                <td>{price}</td>
-                                <td>{fixedFloatNumber(listOfSum?.asksSum[index], 4)}</td>
-                                <td>{fixedFloatNumber(asksData[price][1], 5)}</td>
-                                <td>{asksData[price][0]}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+        <div className="oder-book-conatiner">   
+
+            { orderBookKeys?.bidsKeys.length    ||orderBookKeys?.asksKeys.length  ?
+                <>
+                    <BidOrderBookTable bidOrderBook={bidsOrderBook} bidOrderBookKeys={orderBookKeys?.bidsKeys} listOfBidsSum ={listOfSum?.bidSum} />
+
+                    <div className="vertical-line"></div>
+
+                    <AsksOrderBookTable askOrderBook={asksOrderBook} askOrderBookKeys={orderBookKeys?.asksKeys} listOfAsksSum ={listOfSum?.asksSum} />
+                </> 
+                : 
+                <Spinner />
+                
+            }
+       
         </div>
     );
 };

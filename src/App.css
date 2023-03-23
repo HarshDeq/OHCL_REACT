@@ -45,11 +45,15 @@
 
 .candlestick-timeframe-container{
     margin:20px 30px; 
+    display: flex;
+    justify-content: center;
 }
 
 .container{
-    height: 300px;
-    padding: 10px 20px 10px 0;
+    /* height: 300px; */
+    /* padding: 10px 20px 10px 0; */
+    display: flex;
+    justify-content: center;
 }
 
 .oder-book-conatiner{
@@ -58,6 +62,11 @@
     justify-content: center;
 }
 
+table{
+  border-collapse: collapse;
+  z-index: 4;
+  position: relative;
+}
 
 th, td {
     padding-top: 2px;
@@ -65,11 +74,11 @@ th, td {
     padding-left: 10px;
     padding-right: 10px;
     text-align: center;
+    color: white;
   }
 
-  th,td{
+  tr,td{
     font-size: 12px;
-
   }
 
   .vertical-line{
@@ -110,5 +119,34 @@ th, td {
    bottom:-10px;
    opacity: .5;
    z-index: 1;
-   left:-15px
+   left:-15px;
+   right:-15px
+  }
+
+  @keyframes spinner {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  .loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 6px solid #f3f3f3; 
+    border-top: 6px solid #383636; 
+    border-radius: 50%;
+    animation: spinner 1.5s linear infinite;
+  }
+
+  .color-white{
+    color: white;
+  }
+
+  .spinner-center{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
   }
