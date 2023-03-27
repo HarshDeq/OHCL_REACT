@@ -1,10 +1,14 @@
+const YEAR_INDEX= 2, MONTH_INDEX = 1, DATE_INDEX=0
 export const dateFormater = (dateTime)=>{
    
     const istDate = new Date(dateTime)
-    const date =  istDate.toLocaleDateString('en-us', {  year:'numeric', month:'numeric', day:'numeric'}) 
+    
+    const date =  istDate.toLocaleDateString('en-GB', {  year:'numeric', month:'short', day:'numeric'}).split(' ')
+
+    const newFormatedDate = `${date[DATE_INDEX]} ${date[MONTH_INDEX]}'${date[YEAR_INDEX].split('20').join('')}`
 
     const time = istDate.toLocaleTimeString('en-GB').split(':')
     time.pop()
-    const newDate = `${time.join(':')} ${date}` 
-    return  newDate
+    return `${newFormatedDate} ${time.join(':')}` 
+    
 }

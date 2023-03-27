@@ -3,27 +3,48 @@ import axios from 'axios';
 export const getRequest = async (url, config) => {
     try {
         const response = await axios.get(url, config);
-        // console.log(response)
-        return response;
+        return {
+            error:false,
+            data:response.data,
+            status:response.status
+        }
     } catch (err) {
-        console.log(err.response.status);
+
+        return {
+            status:err.response.status,
+            error:true
+        }
     }
 };
 
 export const postRequest = async (url, requestData, config) => {
     try {
         const response = await axios.post(url, requestData, config);
-        return response;
+        return {
+            error:false,
+            data:response.data,
+            status:response.status
+        }
     } catch (err) {
-        console.log(err);
+        return {
+            status:err.response.status,
+            error:true
+        }
     }
 };
 
 export const putRequest = async (url, updateRequestData, config) => {
     try {
         const response = await axios.put(url, updateRequestData, config);
-        return response;
+        return {
+            error:false,
+            data:response.data,
+            status:response.status
+        }
     } catch (err) {
-        console.log(err);
+        return {
+            status:err.response.status,
+            error:true
+        }
     }
 };

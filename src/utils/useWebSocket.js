@@ -1,4 +1,4 @@
-import  { useEffect, useRef, useState } from 'react'
+import  { useEffect, useState } from 'react'
 
 const useWebSocket = (url) => {
 
@@ -7,23 +7,21 @@ const useWebSocket = (url) => {
 
 
     useEffect(()=>{
-       setSocket(new WebSocket(url))
-       
-        socket.onopen = () => setOpen(true);
-        socket.onclose = () => {
-            console.log('close')
-            setOpen(false)
-        };
-      
-        
-        return () => {
-            if(socket){
-                socket.close();
-            }
-        };
-
-
-    },[])
+        if(!socket){
+            setSocket(new WebSocket(url))
+        }else{
+            socket.onopen = () => setOpen(true);
+            socket.onclose = () => {
+                console.log('close')
+                setOpen(false)
+            };
+            return () => {
+                if(socket){
+                    socket.close();
+                }
+            };
+        }
+    },[socket])
 
 
     return [isOpen, socket];

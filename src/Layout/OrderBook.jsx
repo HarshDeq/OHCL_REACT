@@ -2,13 +2,20 @@ import React, { useEffect, useState } from 'react';
 import AsksOrderBookTable from '../Components/AsksOrderBookTable';
 import BidOrderBookTable from '../Components/BidOrderBookTable';
 import Spinner from '../Components/Spinner';
+import { WEB_SOCKET_BASE_URL } from '../utils/constants';
 import { getListOfSumOFOrderBook, updateAsksOrderBook, updateBidsOrderBook } from '../utils/OrderBook';
+import useWebSocket from '../utils/useWebSocket';
+
+const INITIAL_LENGTH_OF_ORDER_BOOK = 50
+const LENGTH_OF_ONE_ORDER = 3
+const INDEX_OF_ORDER_IN_RESPONSE = 1
+const DEFAULT_COMPARISON_AMOUNT_INDEX = 0
 
 const OrderBook = () => {
     const [asksOrderBook, setAsksOrderBook] = useState({});
     const [bidsOrderBook, setBidsOrderBook] = useState({});
 
-    // const [open, response, socket] = useWebSocket(WEB_SOCKET_BASE_URL)
+    const [open, socket] = useWebSocket(WEB_SOCKET_BASE_URL)
 
     const [orderBookKeys, setOrderBookKeys] = useState({
         asksKeys: [],
@@ -62,111 +69,47 @@ const OrderBook = () => {
     };
 
     const updateOrderBookBasedOnAmount = (order)=>{
-        const DEFAULT_COMPARISON_AMOUNT = 0
+
         const AMOUNT_INDEX = 2;
 
-        if (order[AMOUNT_INDEX] > DEFAULT_COMPARISON_AMOUNT) {
+        if (order[AMOUNT_INDEX] > DEFAULT_COMPARISON_AMOUNT_INDEX) {
             updateBids(order);
         } else {
             updateAsks(order);
         }
-
     }
-  
 
     useEffect(() => {
-
-        const SOCKET_URL = 'wss://api-pub.bitfinex.com/ws/2';
-
-        const SOCKET = new WebSocket(SOCKET_URL);
 
         const BOOK = JSON.stringify({
             event: 'subscribe',
             channel: 'book',
             symbol: 'tBTCUSD',
-            prec: 'P1',
-            freq:'F1'
+            prec: 'P0',
+            freq:'F0'
         });
-
-        SOCKET.onopen = () => {
-            SOCKET.send(BOOK);
-        };
-
-        SOCKET.onmessage = (e) => {
-            const INITIAL_LENGTH_OF_ORDER_BOOK = 50
-            const LENGTH_OF_ONE_ORDER = 3
-            const INDEX_OF_ORDER_IN_RESPONSE = 1
-                
-            const orderBookData = JSON.parse(e.data)[INDEX_OF_ORDER_IN_RESPONSE];
-
-
-            if (orderBookData?.length === INITIAL_LENGTH_OF_ORDER_BOOK) {
-                orderBookData?.forEach((order) => {
-                    updateOrderBookBasedOnAmount( order)
-                });
-            } else if (orderBookData?.length === LENGTH_OF_ONE_ORDER) {
-                updateOrderBookBasedOnAmount(orderBookData)
-            }
-        };
-    
-        SOCKET.onclose=()=>{
-            console.log('close')
-            
-        }
-
-        return ()=>{
-            SOCKET.close()
-        }
-
        
-        // if(open){
-        //     socket.send(BOOK)
-        // }
+        if(open){
+            socket.send(BOOK)
+            socket.onmessage = (e) => {
+                const orderBookData = JSON.parse(e.data)[INDEX_OF_ORDER_IN_RESPONSE];
 
+                if (orderBookData?.length === INITIAL_LENGTH_OF_ORDER_BOOK) {
+                    orderBookData?.forEach((order) => {
+                        updateOrderBookBasedOnAmount( order)
+                    });
+                } else if (orderBookData?.length === LENGTH_OF_ONE_ORDER) {
+                    updateOrderBookBasedOnAmount(orderBookData)
+                }
+            };
+        }
 
-    }, []);
-
-    // useEffect(()=>{
-
-    //     const AMOUNT_INDEX = 2;
-    //     const INDEX_OF_ORDER_IN_RESPONSE = 1
-    //     const LENGTH_OF_ONE_ORDER = 3
-    //     const INITIAL_LENGTH_OF_ORDER_BOOK = 50
-
-
-    //     const order = response?.[INDEX_OF_ORDER_IN_RESPONSE]
-
-    //     // console.log(order !== undefined, order)
-           
-                
-    //     if ( order?.length === INITIAL_LENGTH_OF_ORDER_BOOK) {
-    //         order?.forEach((newOrder) => {
-    //             // console.log(newOrder,"new")
-    //             if (newOrder[AMOUNT_INDEX] > 0) {
-    //                 updateBids(newOrder);
-    //             } else {
-    //                 updateAsks(newOrder);
-    //             }
-                   
-    //         });
-    //     } 
-    //     else if ( order?.length === LENGTH_OF_ONE_ORDER) {
-    //         // console.log(order,"order")
-    //         if (order[AMOUNT_INDEX] > 0) {
-    //             updateBids(order);
-    //         } else {
-    //             updateAsks(order);
-    //         }
-    //     }
-
-      
-    // },[response])
-
+    }, [open]);
 
     return (
         <div className="oder-book-conatiner">   
 
-            { orderBookKeys?.bidsKeys.length    ||orderBookKeys?.asksKeys.length  ?
+            { (orderBookKeys?.bidsKeys.length || orderBookKeys?.asksKeys.length)?
                 <>
                     <BidOrderBookTable bidOrderBook={bidsOrderBook} bidOrderBookKeys={orderBookKeys?.bidsKeys} listOfBidsSum ={listOfSum?.bidSum} />
 
@@ -175,10 +118,8 @@ const OrderBook = () => {
                     <AsksOrderBookTable askOrderBook={asksOrderBook} askOrderBookKeys={orderBookKeys?.asksKeys} listOfAsksSum ={listOfSum?.asksSum} />
                 </> 
                 : 
-                <Spinner />
-                
+                <Spinner />   
             }
-       
         </div>
     );
 };

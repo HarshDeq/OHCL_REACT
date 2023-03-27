@@ -3,18 +3,19 @@ import CustomChart from '../Components/Chart';
 import OHLCDataPoints from '../Components/OHLCDataPoints';
 import Select from '../Components/Select';
 import Spinner from '../Components/Spinner';
-import { TIME_STAMPS, TIME_DURATION_LABELS } from '../utils/constants';
+import { TIME_DURATION_LABELS, TIME_DURATON, TRADING_PAIR, TRADING_PAIR_LABLES } from '../utils/constants';
+import { dateFormater } from '../utils/formatter';
 import { getCurrentTimeStamp } from '../utils/getCurrentTimeStamp';
-import { ohlcChartDataPromise } from '../utils/getOHLCChartData';
+import { ohlcChartData } from '../utils/getOHLCChartData';
 import { getTimeFrame } from '../utils/getTimeFrame';
+import { fixedFloatNumber } from '../utils/utilsForNumber';
 
-const options = (events)=>{
-
+const options = (events) => {
     return {
         chart: {
             type: 'candlestick',
             id: 'candles',
-            events:{...events},
+            events: { ...events },
             toolbar: {
                 show: false,
             },
@@ -24,30 +25,14 @@ const options = (events)=>{
         },
         xaxis: {
             type: 'datetime',
-           
+
             datetimeFormatter: {
                 year: 'yyyy',
                 month: 'MMM \'yy',
                 day: 'dd MMM',
                 hour: 'HH:mm',
             },
-    
-            axisBorder: {
-                show: true,
-                color: '#78909C',
-                height: 1,
-                width: '100%',
-                offsetX: 0,
-                offsetY: 0,
-            },
-            axisTicks: {
-                show: true,
-                borderType: 'solid',
-                color: '#78909C',
-                height: 6,
-                offsetX: 0,
-                offsetY: 0,
-            },
+
             labels: {
                 datetimeUTC: false,
                 style: {
@@ -56,6 +41,12 @@ const options = (events)=>{
                     fontFamily: 'Helvetica, Arial, sans-serif',
                     fontWeight: 400,
                     cssClass: 'apexcharts-yaxis-label',
+                },
+            },
+            tooltip: {
+                enabled: true,
+                formatter: (value) => {
+                    return dateFormater(value);
                 },
             },
         },
@@ -70,7 +61,7 @@ const options = (events)=>{
                 },
             },
         },
-    
+
         plotOptions: {
             candlestick: {
                 colors: {
@@ -84,6 +75,10 @@ const options = (events)=>{
         },
         tooltip: {
             enabled: true,
+            z: {
+                formatter: undefined,
+                title: 'Size: ',
+            },
             fixed: {
                 enabled: true,
                 position: 'topRight',
@@ -91,16 +86,31 @@ const options = (events)=>{
                 offsetY: 0,
             },
         },
+        grid: {
+            show: true,
+            borderColor: '#FFFFFF',
+            strokeDashArray: 1,
+            position: 'back',
+            xaxis: {
+                lines: {
+                    show: true,
+                },
+            },
+            yaxis: {
+                lines: {
+                    show: true,
+                },
+            },
+        },
     };
-    
-}
+};
 
 const CONSTANTINDEX = {
     date: 0,
     O: 1,
+    C: 2,
     H: 3,
     L: 4,
-    C: 2,
 };
 
 const CONSTANT_INDEX_OF_OHLC_IN_CHART = {
@@ -108,10 +118,11 @@ const CONSTANT_INDEX_OF_OHLC_IN_CHART = {
     H: 1,
     L: 2,
     C: 3,
-}
+};
 
 const OHLC = () => {
-    const [timeDuration, setTimeDuration] = useState(TIME_STAMPS.oneHour);
+    const [timeDuration, setTimeDuration] = useState(TIME_DURATON.oneHour);
+    const [tradingPair,setTradingPair] = useState(TRADING_PAIR.bitCoinUSD);
 
     const [ohlcCharData, setOhlcChartData] = useState([]);
     const [ohlcDataPoints, setOHLCDataPoints] = useState({
@@ -121,17 +132,22 @@ const OHLC = () => {
         C: 0,
     });
 
-    const handleTimeStampChange = (e) => {
+    const handleChangeTimeDuration = (e) => {
         setTimeDuration(Number(e.target.value));
     };
 
-    const getOHLCData = () => {
+    const handleChangeTradingPair = (e) => {
+        setTradingPair(e.target.value)
+    };
+
+    const getOHLCData = async () => {
         const currentTimeStamp = getCurrentTimeStamp();
         const diffInTimeStamp = currentTimeStamp - timeDuration;
         const timeFrame = getTimeFrame(timeDuration);
-        const response = ohlcChartDataPromise(timeFrame, diffInTimeStamp);
-        response.then((res) => {
-            const formatedData = res?.data?.map((order) => {
+        const response = await ohlcChartData(timeFrame, diffInTimeStamp,tradingPair);
+
+        if (!response.error) {
+            const formatedData = response?.data?.map((order) => {
                 return {
                     x: new Date(order[CONSTANTINDEX?.date]),
                     y: [
@@ -151,55 +167,93 @@ const OHLC = () => {
             const LATEST_ORDER = formatedData[INDEX_OF_LATEST_DATA_BY_DATE].y;
 
             setOHLCDataPoints({
-                O: LATEST_ORDER[CONSTANT_INDEX_OF_OHLC_IN_CHART.O],
-                H: LATEST_ORDER[CONSTANT_INDEX_OF_OHLC_IN_CHART.H],
-                L: LATEST_ORDER[CONSTANT_INDEX_OF_OHLC_IN_CHART.L],
-                C: LATEST_ORDER[CONSTANT_INDEX_OF_OHLC_IN_CHART.C],
-            });
-        });
-    };
-    
-
-    const mouseMove = (event, chartContext, config) => {   
-        const NO_DATA_INDEX =-1                
-        const ohlcChartDataPointIndex = config.dataPointIndex
-        if(ohlcChartDataPointIndex !== NO_DATA_INDEX){
-
-            const dataPoint = ohlcCharData[ohlcChartDataPointIndex]?.y
-            setOHLCDataPoints({
-                O: dataPoint[CONSTANT_INDEX_OF_OHLC_IN_CHART.O],
-                H: dataPoint[CONSTANT_INDEX_OF_OHLC_IN_CHART.H],
-                L: dataPoint[CONSTANT_INDEX_OF_OHLC_IN_CHART.L],
-                C: dataPoint[CONSTANT_INDEX_OF_OHLC_IN_CHART.C],
+                O: fixedFloatNumber(LATEST_ORDER[CONSTANT_INDEX_OF_OHLC_IN_CHART.O], 0),
+                H: fixedFloatNumber(LATEST_ORDER[CONSTANT_INDEX_OF_OHLC_IN_CHART.H], 0),
+                L: fixedFloatNumber(LATEST_ORDER[CONSTANT_INDEX_OF_OHLC_IN_CHART.L], 0),
+                C: fixedFloatNumber(LATEST_ORDER[CONSTANT_INDEX_OF_OHLC_IN_CHART.C], 0),
             });
         }
-    }
+    };
+
+    const mouseMove = (event, chartContext, config) => {
+        const NO_DATA_INDEX = -1;
+        const INDEX_OF_LIST_OF_DATA_POINTS = 0;
+        const ohlcChartDataPointIndex = config.dataPointIndex;
+
+        if (ohlcChartDataPointIndex > NO_DATA_INDEX) {
+            const open = fixedFloatNumber(
+                config.globals.seriesCandleO[INDEX_OF_LIST_OF_DATA_POINTS][
+                    ohlcChartDataPointIndex
+                ],
+                0
+            );
+            const close = fixedFloatNumber(
+                config.globals.seriesCandleC[INDEX_OF_LIST_OF_DATA_POINTS][
+                    ohlcChartDataPointIndex
+                ],
+                0
+            );
+            const high = fixedFloatNumber(
+                config.globals.seriesCandleH[INDEX_OF_LIST_OF_DATA_POINTS][
+                    ohlcChartDataPointIndex
+                ],
+                0
+            );
+            const low = fixedFloatNumber(
+                config.globals.seriesCandleL[INDEX_OF_LIST_OF_DATA_POINTS][
+                    ohlcChartDataPointIndex
+                ],
+                0
+            );
+
+            setOHLCDataPoints({
+                O: open,
+                H: high,
+                L: low,
+                C: close,
+            });
+        }
+    };
 
     useEffect(() => {
         getOHLCData();
-    }, [timeDuration]);
+    }, [timeDuration,tradingPair]);
 
     return (
         <div>
             {ohlcCharData?.length ? (
                 <>
-                    <div className="candlestick-timeframe-container">
-                        <label className="color-white">Select Duration :&nbsp;</label>
-                        <Select
-                            value={timeDuration}
-                            options={TIME_DURATION_LABELS}
-                            onChange={handleTimeStampChange}
-                        />
-                    </div>
-                   
-                    <OHLCDataPoints ohlcPoints = {ohlcDataPoints} />
-
                     {ohlcCharData?.length > 0 && (
-                        <div>
-                            <div className="container">
+                        <div className="container">
+                            <div>
+                                <div className="display-flex">
+                                    <div className='select-margin'>
+                                        <label className="color-white">
+                      Select Duration :&nbsp;
+                                        </label>
+                                        <Select
+                                            value={timeDuration}
+                                            options={TIME_DURATION_LABELS}
+                                            onChange={handleChangeTimeDuration}
+                                        />
+                                    </div>
+                                    <div className='select-margin'>
+                                        <label className="color-white">
+                      Select Trading Pair :&nbsp;
+                                        </label>
+                                        <Select
+                                            value={tradingPair}
+                                            options={TRADING_PAIR_LABLES}
+                                            onChange={handleChangeTradingPair}
+                                        />
+                                    </div>
+                                    <div>
+                                        <OHLCDataPoints ohlcPoints={ohlcDataPoints} />
+                                    </div>
+                                </div>
                                 <CustomChart
                                     data={ohlcCharData}
-                                    options={options({mouseMove})}
+                                    options={options({ mouseMove })}
                                     type="candlestick"
                                     height="400"
                                     width="1000"

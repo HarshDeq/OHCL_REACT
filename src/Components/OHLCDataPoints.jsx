@@ -2,9 +2,10 @@ import React from 'react'
 
 const OHLCDataPoints = (props) => {
     const {ohlcPoints} = props
+
     return (
         <div
-            className={`display-flex ${ohlcPoints?.O >= ohlcPoints?.C ? 'red' : 'green'} candlestick-timeframe-container`}
+            className={`display-flex ${ohlcPoints?.O > ohlcPoints?.C ? 'red' : 'green'} `}
         >
             <div className='OHLC-datapoints'>
                 <span>O :&nbsp;</span>
