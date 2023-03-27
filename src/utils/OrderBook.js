@@ -1,4 +1,4 @@
-const constantIndexForOrder ={
+const CONSTANT_INDEX_FOR_NEW_ORDER ={
     PRICE_INDEX : 0,
     COUNT_INDEX:1,
     AMOUNT_INDEX : 2
@@ -8,27 +8,27 @@ export const updateAsksOrderBook = (askOrderBook,newOrder)=>{
 
     const asks = askOrderBook
 
-    if (newOrder[constantIndexForOrder.COUNT_INDEX] > 0) {
-        asks[newOrder[constantIndexForOrder.PRICE_INDEX]] = {
-            count:newOrder[constantIndexForOrder.COUNT_INDEX],
-            amount: Math.abs(newOrder[constantIndexForOrder.AMOUNT_INDEX]),
+    if (newOrder[CONSTANT_INDEX_FOR_NEW_ORDER.COUNT_INDEX] > 0) {
+        asks[newOrder[CONSTANT_INDEX_FOR_NEW_ORDER.PRICE_INDEX]] = {
+            count:newOrder[CONSTANT_INDEX_FOR_NEW_ORDER.COUNT_INDEX],
+            amount: Math.abs(newOrder[CONSTANT_INDEX_FOR_NEW_ORDER.AMOUNT_INDEX]),
         };
     } else {
-        delete asks[newOrder[constantIndexForOrder.PRICE_INDEX]];
+        delete asks[newOrder[CONSTANT_INDEX_FOR_NEW_ORDER.PRICE_INDEX]];
     }
 
     return asks
 }
 
 
-export const updateBidsOrderBook = (askOrderBook,newOrder)=>{
+export const updateBidsOrderBook = (bidOrderBook,newOrder)=>{
 
-    const bids = askOrderBook;
+    const bids = bidOrderBook;
 
-    if (newOrder[constantIndexForOrder.COUNT_INDEX] > 0) {
-        bids[newOrder[constantIndexForOrder.PRICE_INDEX]] = {count:newOrder[constantIndexForOrder.COUNT_INDEX], amount:newOrder[constantIndexForOrder.AMOUNT_INDEX]};
+    if (newOrder[CONSTANT_INDEX_FOR_NEW_ORDER.COUNT_INDEX] > 0) {
+        bids[newOrder[CONSTANT_INDEX_FOR_NEW_ORDER.PRICE_INDEX]] = {count:newOrder[CONSTANT_INDEX_FOR_NEW_ORDER.COUNT_INDEX], amount:newOrder[CONSTANT_INDEX_FOR_NEW_ORDER.AMOUNT_INDEX]};
     } else {
-        delete bids[newOrder[constantIndexForOrder.PRICE_INDEX]];
+        delete bids[newOrder[CONSTANT_INDEX_FOR_NEW_ORDER.PRICE_INDEX]];
     }
 
     return bids
