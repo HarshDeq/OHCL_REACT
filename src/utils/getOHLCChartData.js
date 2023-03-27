@@ -5,7 +5,7 @@ import {   notifyError, notifySuccess } from './notificationToast';
 export const ohlcChartData = async (timeFrame,diffInTimeStamp,tradingPair)=>{
 
     const response = await getRequest(
-        `${HTTPS_REQUEST_BASE_URL}/candles/trade:${timeFrame}:${tradingPair}/hist?start=${diffInTimeStamp}`
+        `${HTTPS_REQUEST_BASE_URL}/candles/trade:${timeFrame}:${tradingPair}/hist?start=${diffInTimeStamp}&limit=500`
     );
     
     if(!response.error){

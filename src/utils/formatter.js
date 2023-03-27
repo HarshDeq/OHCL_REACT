@@ -5,7 +5,7 @@ export const dateFormater = (dateTime)=>{
     
     const date =  istDate.toLocaleDateString('en-GB', {  year:'numeric', month:'short', day:'numeric'}).split(' ')
 
-    const newFormatedDate = `${date[DATE_INDEX]} ${date[MONTH_INDEX]}'${date[YEAR_INDEX].split('20').join('')}`
+    const newFormatedDate = `${date[DATE_INDEX]} ${date[MONTH_INDEX]}'${date[YEAR_INDEX].slice(2)}`
 
     const time = istDate.toLocaleTimeString('en-GB').split(':')
     time.pop()

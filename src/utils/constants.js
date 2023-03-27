@@ -1,3 +1,5 @@
+import { dateFormater } from './formatter';
+
 export const HTTPS_REQUEST_BASE_URL = 'https://api-pub.bitfinex.com/v2';
 
 export const WEB_SOCKET_BASE_URL = 'wss://api-pub.bitfinex.com/ws/2';
@@ -57,3 +59,99 @@ export const TIME_DURATION_LABELS = [
     { value: TIME_DURATON.oneYear, label: '1 Year' },
     { value: TIME_DURATON.threeYear, label: '3 Year' },
 ];
+
+
+export const ohlcChartOption = (events) => {
+    return {
+        chart: {
+            type: 'candlestick',
+            id: 'candles',
+            events: { ...events },
+            toolbar: {
+                show: false,
+            },
+            zoom: {
+                enabled: true,
+            },
+        },
+        xaxis: {
+            type: 'datetime',
+
+            datetimeFormatter: {
+                year: 'yyyy',
+                month: 'MMM \'yy',
+                day: 'dd MMM',
+                hour: 'HH:mm',
+            },
+
+            labels: {
+                datetimeUTC: false,
+                style: {
+                    colors: '#FFFFFF',
+                    fontSize: '10px',
+                    fontFamily: 'Helvetica, Arial, sans-serif',
+                    fontWeight: 400,
+                    cssClass: 'apexcharts-yaxis-label',
+                },
+            },
+            tooltip: {
+                enabled: true,
+                formatter: (value) => {
+                    return dateFormater(value);
+                },
+            },
+        },
+        yaxis: {
+            show: true,
+            labels: {
+                formatter: (value) => {
+                    return Math.round(value);
+                },
+                style: {
+                    colors: '#FFFFFF',
+                },
+            },
+        },
+
+        plotOptions: {
+            candlestick: {
+                colors: {
+                    upward: '#00B746',
+                    downward: '#EF403C',
+                },
+                wick: {
+                    useFillColor: true,
+                },
+            },
+        },
+        tooltip: {
+            enabled: true,
+            z: {
+                formatter: undefined,
+                title: 'Size: ',
+            },
+            fixed: {
+                enabled: true,
+                position: 'topRight',
+                offsetX: 0,
+                offsetY: 0,
+            },
+        },
+        grid: {
+            show: true,
+            borderColor: '#FFFFFF',
+            strokeDashArray: 1,
+            position: 'back',
+            xaxis: {
+                lines: {
+                    show: true,
+                },
+            },
+            yaxis: {
+                lines: {
+                    show: true,
+                },
+            },
+        },
+    };
+};

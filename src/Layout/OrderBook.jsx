@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, {  useContext, useEffect, useState } from 'react';
+import { TradingPairContext } from '../App';
 import AsksOrderBookTable from '../Components/AsksOrderBookTable';
 import BidOrderBookTable from '../Components/BidOrderBookTable';
 import Spinner from '../Components/Spinner';
 import { WEB_SOCKET_BASE_URL } from '../utils/constants';
-import { getListOfSumOFOrderBook, updateAsksOrderBook, updateBidsOrderBook } from '../utils/OrderBook';
+import { getListOfSumOFOrderBook, subscribeOrderBook, updateAsksOrderBook, updateBidsOrderBook } from '../utils/OrderBook';
 import useWebSocket from '../utils/useWebSocket';
 
-const INITIAL_LENGTH_OF_ORDER_BOOK = 50
-const LENGTH_OF_ONE_ORDER = 3
-const INDEX_OF_ORDER_IN_RESPONSE = 1
 const DEFAULT_COMPARISON_AMOUNT_INDEX = 0
 
 const OrderBook = () => {
+    const {tradingPair} = useContext(TradingPairContext)
+
     const [asksOrderBook, setAsksOrderBook] = useState({});
     const [bidsOrderBook, setBidsOrderBook] = useState({});
 
-    const [open, socket] = useWebSocket(WEB_SOCKET_BASE_URL)
+    const [isOpen,send,close,updateOrderBook,socket,openNewConnection] = useWebSocket()
 
     const [orderBookKeys, setOrderBookKeys] = useState({
         asksKeys: [],
@@ -80,31 +80,34 @@ const OrderBook = () => {
     }
 
     useEffect(() => {
+        if(isOpen && socket){
 
-        const BOOK = JSON.stringify({
-            event: 'subscribe',
-            channel: 'book',
-            symbol: 'tBTCUSD',
-            prec: 'P0',
-            freq:'F0'
-        });
-       
-        if(open){
-            socket.send(BOOK)
-            socket.onmessage = (e) => {
-                const orderBookData = JSON.parse(e.data)[INDEX_OF_ORDER_IN_RESPONSE];
-
-                if (orderBookData?.length === INITIAL_LENGTH_OF_ORDER_BOOK) {
-                    orderBookData?.forEach((order) => {
-                        updateOrderBookBasedOnAmount( order)
-                    });
-                } else if (orderBookData?.length === LENGTH_OF_ONE_ORDER) {
-                    updateOrderBookBasedOnAmount(orderBookData)
-                }
-            };
+            send(subscribeOrderBook(tradingPair))
+            updateOrderBook(updateOrderBookBasedOnAmount)
         }
 
-    }, [open]);
+    }, [isOpen,socket]);
+
+    useEffect(()=>{
+        
+        if(isOpen){
+            close()
+            setAsksOrderBook({})
+            setBidsOrderBook({})
+            setOrderBookKeys({
+                asksKeys: [],
+                bidsKeys: [],
+            })
+
+            setListOfSum({
+                asksSum: [],
+                bidSum: [],
+            })
+        }
+        openNewConnection(WEB_SOCKET_BASE_URL)
+        
+    },[tradingPair])
+
 
     return (
         <div className="oder-book-conatiner">   

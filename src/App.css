@@ -49,6 +49,10 @@
     justify-content: center;
 }
 
+.container_input_traing_pair{
+  margin: 10px;
+}
+
 .container{
     /* height: 300px; */
     /* padding: 10px 20px 10px 0; */

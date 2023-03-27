@@ -1,3 +1,5 @@
 export const fixedFloatNumber = (num, fixed) => {
-    return num?.toFixed(fixed);
+    if(typeof num === 'number' || typeof fixed === 'number'){
+        return num?.toFixed(fixed);
+    }
 };

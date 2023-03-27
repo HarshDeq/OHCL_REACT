@@ -52,3 +52,10 @@ export const getListOfSumOFOrderBook = (orderBookKeys, orderBook) => {
 };
 
 
+export const subscribeOrderBook =(tradingPair)=> JSON.stringify({
+    event: 'subscribe',
+    channel: 'book',
+    symbol: tradingPair,
+    prec: 'P0',
+    freq:'F0'
+});
